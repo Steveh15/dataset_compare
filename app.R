@@ -40,35 +40,57 @@ ui <- fluidPage(
           ),
 
           mainPanel(
-            verbatimTextOutput("comparison_result"),
-            uiOutput("rows_comparison_html") # Placeholder for accordion content
+            # verbatimTextOutput("comparison_result"),
+            uiOutput("rows_comparison_html"), # Placeholder for accordion content
+            uiOutput("compare_columns_html") # Placeholder for accordion content
           )
         )
 
 )
 
 
+# --- DEV SETTINGS
+# ##########################################
+
+auto_load_datasets <- TRUE
+
+
+############################################
+############################################
+
+
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
 
-  # Reactive values to hold the datasets
+  # # Reactive values to hold the datasets
+  # dataset1 <- reactive({
+  #   # req(input$dataset1)
+  #   if (is.null(input$dataset1)) {
+  #     return(NULL)  # Return NULL if no file is uploaded
+  #   }
+  #   haven::read_xpt(input$dataset1$datapath)
+  #   # df1
+  # })
+  #
+  # dataset2 <- reactive({
+  #   # req(input$dataset2)
+  #   if (is.null(input$dataset2)) {
+  #     return(NULL)  # Return NULL if no file is uploaded
+  #   }
+  #   haven::read_xpt(input$dataset2$datapath)
+  #   # df2
+  # })
+
+
+
   dataset1 <- reactive({
-    # req(input$dataset1)
-    if (is.null(input$dataset1)) {
-      return(NULL)  # Return NULL if no file is uploaded
-    }
-    haven::read_xpt(input$dataset1$datapath)
-    # df1
+    df1
   })
 
   dataset2 <- reactive({
-    # req(input$dataset2)
-    if (is.null(input$dataset2)) {
-      return(NULL)  # Return NULL if no file is uploaded
-    }
-    haven::read_xpt(input$dataset2$datapath)
-    # df2
+    df2
   })
+
 
 
 
@@ -179,17 +201,23 @@ server <- function(input, output, session) {
   })
 
 
-  output$rows_comparison_html <- renderUI({
 
-    # req(comparison_result())
+  output$rows_comparison_html <- renderUI({
     req(comparison_result()$row_count_diff)
-    tags$div(
-      tags$h5("Number of Rows Comparison"),
-      tags$p(paste("Dataset 1 has", comparison_result()$row_count_diff$df1_rows, "rows.")),
-      tags$p(paste("Dataset 2 has", comparison_result()$row_count_diff$df2_rows, "rows.")),
-      tags$p(paste("Difference in number of rows:", comparison_result()$row_count_diff$row_diff))
-    )
+    comparison_result()$row_count_diff$html_output
   })
+
+
+  output$compare_columns_html <- renderUI({
+    req(comparison_result()$column_diff)
+
+    comparison_result()$column_diff$html_output
+
+  })
+
+
+
+
 
 }
 

@@ -93,4 +93,49 @@ keys_b_not_in_a
 
 
 
+
+library(htmlTable)
+
 compare_list <- compareDatasets(df1, df2)
+
+
+print(compare_list)
+
+
+
+
+
+columns1 <- data.frame(name = colnames(df1), type = sapply(df1, get_class))
+columns2 <- data.frame(name = colnames(df2), type = sapply(df2, get_class))
+
+
+column_compare <- merge(columns1, columns2, by = "name")
+res <- column_compare[column_compare$type.x != column_compare$type.y,]
+
+
+colnames(res) <- c("Custom Header 1", "Custom Header 2", "Custom Header 3")
+
+# Convert to HTML table
+html_output <- htmlTable(res)
+html_output
+
+
+
+
+custom_headers <- c("Variable", "Dataset 1", "Dataset 2")
+
+# Create the HTML table
+html_output <- tags$table(
+  tags$thead(
+    tags$tr(lapply(custom_headers, tags$th))
+  ),
+  tags$tbody(
+    lapply(seq_len(nrow(res)), function(i) {
+      tags$tr(lapply(res[i, ], function(x) tags$td(x)))
+    })
+  )
+)
+
+# Render as HTML
+html_output
+

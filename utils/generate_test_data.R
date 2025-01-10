@@ -11,7 +11,10 @@ df1_1 <- pharmaverseadam::adpp %>%
 
 
 df2 <- df1_1[  -sample(1:nrow(df1_1), 200), ] %>%
-  select(-c(DTHFL, DTHDTC))
+  select(-c(DTHFL, DTHDTC)) %>%
+  mutate(
+    AGE = as.character(AGE)
+  )
 
 df1 <- df1_1 %>%
   select(-c(DMDY, TRTSDTM, TRTSTMF))
