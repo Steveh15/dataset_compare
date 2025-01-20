@@ -1,116 +1,36 @@
-#
-# This is a Shiny web application. You can run the application by clicking
-# the 'Run App' button above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    https://shiny.posit.co/
-#
-
-rm(list = ls())
-
-library(shiny)
-library(dplyr)
-library(shinyBS)
-library(DT)
-
-
-
-# shinyWidgets::popo
-# shinyWidgets::shinyWidgetsGallery()
-
-
-
-df1 <- haven::read_xpt(file.path("data", "df1.xpt"))
-df2 <- haven::read_xpt(file.path("data", "df2.xpt"))
-
-source("utils/compare_datasets_function.R")
-source("utils/functions.R")
-
-
-
-# Define UI for application that draws a histogram
-ui <- fluidPage(
-
-    # Application title
-    titlePanel("ADPP compare"),
-
-        sidebarLayout(
-          sidebarPanel(
-            fileInput("dataset1", "Upload First Dataset (.xpt):", accept = c(".xpt")),
-            fileInput("dataset2", "Upload Second Dataset (.xpt):", accept = c(".xpt")),
-            # checkboxInput("unique_keys_check", "Define unique keys for comparison?", value = FALSE),
-            # uiOutput("unique_keys_checkbox"),
-            checkboxInput("unique_keys_check", "Define unique keys for comparison?", value = FALSE),
-            uiOutput("validation_message"),
-            uiOutput("key_selector_ui"),
-            uiOutput("compare_btn_ui"),
-
-            # actionButton("compare_btn", "Compare Datasets")
-
-          ),
-
-          mainPanel(
-
-            uiOutput("key_ui"),
-            # verbatimTextOutput("comparison_result"),
-            uiOutput("rows_comparison_html"), # Placeholder for accordion content
-            uiOutput("compare_columns_html"), # Placeholder for accordion content
-            # bsPopover("rows_comparison_html"),
-            # DTOutput("iris_table")
-
-            )
-          )
-    )
-
-
-# --- DEV SETTINGS
-# ##########################################
-
-auto_load_datasets <- TRUE
-
-
-############################################
-############################################
-
 
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
 
-  # # Reactive values to hold the datasets
-  # dataset1 <- reactive({
-  #   # req(input$dataset1)
-  #   if (is.null(input$dataset1)) {
-  #     return(NULL)  # Return NULL if no file is uploaded
-  #   }
-  #   haven::read_xpt(input$dataset1$datapath)
-  #   # df1
-  # })
-  #
-  # dataset2 <- reactive({
-  #   # req(input$dataset2)
-  #   if (is.null(input$dataset2)) {
-  #     return(NULL)  # Return NULL if no file is uploaded
-  #   }
-  #   haven::read_xpt(input$dataset2$datapath)
-  #   # df2
-  # })
-
-
-
+  # Reactive values to hold the datasets
   dataset1 <- reactive({
-    df1
+
+    if(input$load_test_data){
+      print("Hello!")
+      return (df1)
+    }
+    else if (is.null(input$dataset1)) {
+      return(NULL)  # Return NULL if no file is uploaded
+    }
+    haven::read_xpt(input$dataset1$datapath)
+
   })
 
   dataset2 <- reactive({
-    df2
+
+    if(input$load_test_data){
+      print("Hello 2!")
+      return (df2)
+    }
+    else if (is.null(input$dataset2)) {
+      return(NULL)  # Return NULL if no file is uploaded
+    }
+    haven::read_xpt(input$dataset2$datapath)
+
   })
 
 
-
-
   output$compare_btn_ui <- renderUI({
-
 
     # Disable if datasets don't exist, or if unique keys have been requested but the keys aren't valid
     if (is.null(dataset1()) || is.null(dataset2()) || (input$unique_keys_check & !valid_keys())  ) {
@@ -122,8 +42,6 @@ server <- function(input, output, session) {
 
 
   })
-
-
 
 
   # Find common variables between the two datasets
@@ -248,8 +166,3 @@ server <- function(input, output, session) {
 
 
 }
-
-# Run the application
-shinyApp(ui = ui, server = server)
-
-

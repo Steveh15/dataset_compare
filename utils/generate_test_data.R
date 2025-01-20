@@ -1,5 +1,3 @@
-library(dplyr)
-library(pharmaverseadam)
 
 # Example data for testing
 
@@ -17,17 +15,10 @@ df2 <- df1_1[  -sample(1:nrow(df1_1), 25), ] %>%
     AGE = as.character(AGE)
   )
 
-# 2688
-
 
 df1 <- df1_1[-sample(1:nrow(df1_1), 15), ] %>%
   select(-c(DMDY, TRTSDTM, TRTSTMF))
 
-# Run your compareDatasets function
-# result <- compareDatasets(df1, df2)
-
-# Print the result to inspect
-# print(result)
 
 
 

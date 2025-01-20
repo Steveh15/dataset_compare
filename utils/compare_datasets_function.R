@@ -12,6 +12,3 @@ compareDatasets <- function(df1, df2, unique_keys = NULL) {
   results$row_count_diff <- compare_row_counts(df1, df2, unique_keys)
   return(results)
 }
-
-# Source the comparison functions
-
