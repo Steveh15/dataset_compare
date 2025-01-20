@@ -11,12 +11,22 @@ rm(list = ls())
 
 library(shiny)
 library(dplyr)
+library(shinyBS)
+library(DT)
+
+
+
+# shinyWidgets::popo
+# shinyWidgets::shinyWidgetsGallery()
+
+
+
+df1 <- haven::read_xpt(file.path("data", "df1.xpt"))
+df2 <- haven::read_xpt(file.path("data", "df2.xpt"))
 
 source("utils/compare_datasets_function.R")
 source("utils/functions.R")
 
-df1 <- haven::read_xpt(file.path("data", "df1.xpt"))
-df2 <- haven::read_xpt(file.path("data", "df2.xpt"))
 
 
 # Define UI for application that draws a histogram
@@ -34,19 +44,24 @@ ui <- fluidPage(
             checkboxInput("unique_keys_check", "Define unique keys for comparison?", value = FALSE),
             uiOutput("validation_message"),
             uiOutput("key_selector_ui"),
-            uiOutput("compare_btn_ui")
+            uiOutput("compare_btn_ui"),
+
             # actionButton("compare_btn", "Compare Datasets")
 
           ),
 
           mainPanel(
+
+            uiOutput("key_ui"),
             # verbatimTextOutput("comparison_result"),
             uiOutput("rows_comparison_html"), # Placeholder for accordion content
-            uiOutput("compare_columns_html") # Placeholder for accordion content
-          )
-        )
+            uiOutput("compare_columns_html"), # Placeholder for accordion content
+            # bsPopover("rows_comparison_html"),
+            # DTOutput("iris_table")
 
-)
+            )
+          )
+    )
 
 
 # --- DEV SETTINGS
@@ -187,9 +202,15 @@ server <- function(input, output, session) {
     req(dataset1)
     req(dataset2)
 
-    # Use your comparison function here
-    compare_list <- compareDatasets(dataset1(), dataset2())
 
+    if(input$unique_keys_check & valid_keys()){
+      compare_list <- compareDatasets(dataset1(), dataset2(), input$key_vars)
+    } else{
+      compare_list <- compareDatasets(dataset1(), dataset2())
+    }
+
+    # Use your comparison function here
+    # compare_list <- compareDatasets(dataset1(), dataset2())
 
     # Set the value of the comparison_result reactive here
     comparison_result(compare_list)
@@ -210,16 +231,25 @@ server <- function(input, output, session) {
 
   output$compare_columns_html <- renderUI({
     req(comparison_result()$column_diff)
-
+    # comparison_result()$row_count_diff$html_output
     comparison_result()$column_diff$html_output
-
   })
 
 
+  output$key_ui <- renderUI({
 
+    paste0(input$unique_keys_check, " | ", valid_keys(), " : ", paste0(input$key_vars, collapse = ", "))
+
+  })
+
+  output$iris_table <- renderDT({
+    datatable(iris, options = list(pageLength = 5)) # Display with pagination
+  })
 
 
 }
 
 # Run the application
 shinyApp(ui = ui, server = server)
+
+
