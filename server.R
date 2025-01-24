@@ -149,8 +149,13 @@ server <- function(input, output, session) {
 
   output$compare_columns_html <- renderUI({
     req(comparison_result()$column_diff)
-    # comparison_result()$row_count_diff$html_output
     comparison_result()$column_diff$html_output
+  })
+
+
+  output$rounding_check_html <- renderUI({
+    req(comparison_result()$rounding_check)
+    comparison_result()$rounding_check$html_output
   })
 
 
@@ -160,9 +165,6 @@ server <- function(input, output, session) {
 
   })
 
-  output$iris_table <- renderDT({
-    datatable(iris, options = list(pageLength = 5)) # Display with pagination
-  })
 
 
 }

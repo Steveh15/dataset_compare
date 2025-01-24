@@ -1,6 +1,7 @@
 
 library(shiny)
 library(dplyr)
+library(stringr)
 
 
 # For testing

@@ -43,16 +43,16 @@ check_keys <- function(df1, keys = c("USUBJID")) {
 
 
 get_decimal_places <- function(x) {
-  # Convert the number to a character string with significant digits
-  num_str <- format(x, scientific = FALSE, trim = TRUE, digits = 10)
 
-  # Split the string by the decimal point
-  parts <- strsplit(num_str, "\\.")[[1]]
+  num_str <- as.character(x)
 
-  # Check if there are digits after the decimal point
-  if (length(parts) > 1) {
-    return(nchar(gsub("0+$", "", parts[2])))  # Remove trailing zeros and count remaining digits
-  } else {
-    return(0)  # No decimal places
-  }
+  sapply(strsplit(num_str, "\\."), function(x){
+    if(length(x) > 1){
+      return(nchar(gsub("0+$", "", x[2])))
+    } else{
+      return(0)
+    }
+  })
+
+
 }

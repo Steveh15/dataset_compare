@@ -12,7 +12,8 @@ df1_1 <- pharmaverseadam::adpp %>%
 df2 <- df1_1[  -sample(1:nrow(df1_1), 25), ] %>%
   select(-c(DTHFL, DTHDTC)) %>%
   mutate(
-    AGE = as.character(AGE)
+    AGE = as.character(AGE),
+    AVAL = round(AVAL, 3)
   )
 
 
@@ -26,3 +27,7 @@ haven::write_xpt(df1, file.path("data", "df1.xpt"))
 haven::write_xpt(df2, file.path("data", "df2.xpt"))
 
 
+
+
+
+df2 %>% count(PPTESTCD)

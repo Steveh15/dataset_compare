@@ -24,6 +24,7 @@ ui <- fluidPage(
       # verbatimTextOutput("comparison_result"),
       uiOutput("rows_comparison_html"), # Placeholder for accordion content
       uiOutput("compare_columns_html"), # Placeholder for accordion content
+      uiOutput("rounding_check_html"), # Placeholder for accordion content
       # bsPopover("rows_comparison_html"),
       # DTOutput("iris_table")
 
