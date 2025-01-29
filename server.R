@@ -127,10 +127,6 @@ server <- function(input, output, session) {
       compare_list <- compareDatasets(dataset1(), dataset2())
     }
 
-    # Use your comparison function here
-    # compare_list <- compareDatasets(dataset1(), dataset2())
-
-    # Set the value of the comparison_result reactive here
     comparison_result(compare_list)
   })
 
@@ -159,12 +155,24 @@ server <- function(input, output, session) {
   })
 
 
-  output$key_ui <- renderUI({
+  #
+  # --- Download button login
+  #
+  ##############################################################################
 
-    paste0(input$unique_keys_check, " | ", valid_keys(), " : ", paste0(input$key_vars, collapse = ", "))
-
+  output$download_ui <- renderUI({
+    req(comparison_result()$html_report)  # Ensure report exists
+    downloadButton("download_report", "Download HTML Report")
   })
 
+  output$download_report <- downloadHandler(
+    filename = function() {
+      "comparison_report.html"
+    },
+    content = function(file) {
+      writeLines(comparison_result()$html_report, file)
+    }
+  )
 
 
 }

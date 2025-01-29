@@ -22,7 +22,7 @@ compare_columns <- function(df1, df2, unique_keys = NULL) {
       tags$h3("Number of Columns comparison"),
       tags$p(paste("Columns in Dataset 1 only: ", paste0(in_df1_not_df2, collapse = ", "))),
       tags$p(paste("Columns in Dataset 2 only: ", paste0(in_df2_not_df1, collapse = ", "))),
-
+      tags$h4("Column type comparison"),
       htmlTable(
         type_mismatches,
         rnames = FALSE,

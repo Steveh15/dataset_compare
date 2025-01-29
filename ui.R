@@ -13,6 +13,8 @@ ui <- fluidPage(
       uiOutput("validation_message"),
       uiOutput("key_selector_ui"),
       uiOutput("compare_btn_ui"),
+      uiOutput("download_ui")
+
 
 
 
@@ -20,13 +22,9 @@ ui <- fluidPage(
 
     mainPanel(
 
-      uiOutput("key_ui"),
-      # verbatimTextOutput("comparison_result"),
-      uiOutput("rows_comparison_html"), # Placeholder for accordion content
-      uiOutput("compare_columns_html"), # Placeholder for accordion content
-      uiOutput("rounding_check_html"), # Placeholder for accordion content
-      # bsPopover("rows_comparison_html"),
-      # DTOutput("iris_table")
+      uiOutput("rows_comparison_html"),
+      uiOutput("compare_columns_html"),
+      uiOutput("rounding_check_html"),
 
     )
   )
