@@ -2,7 +2,7 @@
 library(shiny)
 library(dplyr)
 library(stringr)
-
+library(shinyBS)
 
 # For testing
 library(pharmaverseadam)

@@ -30,7 +30,10 @@ compare_row_counts <- function(df1, df2, unique_keys = NULL) {
     )
 
     # Convert the widget to raw HTML
-    html_output <- as.tags(dt_widget)
+    html_output <- tagList(
+      tags$h3("Record comparison"),  # Add a heading
+      as.tags(dt_widget)  # Include the widget
+    )
 
     # Return the HTML content
     # HTML(html_output)
@@ -50,32 +53,10 @@ compare_row_counts <- function(df1, df2, unique_keys = NULL) {
         tags$p(paste("Dataset 1 has", df1_rows, "rows.")),
         tags$p(paste("Dataset 2 has", df2_rows, "rows.")),
         tags$p(paste("Difference in number of rows:", row_diff)),
-        tags$p(paste(unique_keys, collapse = ", ")),
         html_output
       )
 
 
     )
 }
-#
-# keys <- c("USUBJID", "ID")
-# res <- compare_row_counts(df1, df2, unique_keys = keys)
-# miss <- res$missing_rows
-#
-#
-# d1 <- df1[, keys]
-# d2 <- df2[, keys]
-# d1$res <- 1
-# d2$res <- 1
-#
-# missing_rows <- merge(d1, d2, by = keys, all = TRUE)
-#
-# missing_rows_1 <- missing_rows[is.na(missing_rows$res.x) | is.na(missing_rows$res.y), ]
-# test <- missing_rows %>% filter(is.na(res.y) | is.na(res.x))
-#
-# missing_rows %>% filter(is.na(USUBJID))
-# is.na(missing_rows$res.x) | is.na(missing_rows$res.y)
-#
-#
-# ?datatable()
 

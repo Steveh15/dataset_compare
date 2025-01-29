@@ -6,7 +6,6 @@ server <- function(input, output, session) {
   dataset1 <- reactive({
 
     if(input$load_test_data){
-      print("Hello!")
       return (df1)
     }
     else if (is.null(input$dataset1)) {
@@ -19,7 +18,6 @@ server <- function(input, output, session) {
   dataset2 <- reactive({
 
     if(input$load_test_data){
-      print("Hello 2!")
       return (df2)
     }
     else if (is.null(input$dataset2)) {
@@ -122,6 +120,8 @@ server <- function(input, output, session) {
 
 
     if(input$unique_keys_check & valid_keys()){
+
+      print("Check")
       compare_list <- compareDatasets(dataset1(), dataset2(), input$key_vars)
     } else{
       compare_list <- compareDatasets(dataset1(), dataset2())
@@ -129,6 +129,9 @@ server <- function(input, output, session) {
 
     comparison_result(compare_list)
   })
+
+
+
 
   # Display the comparison result
   output$comparison_result <- renderPrint({
