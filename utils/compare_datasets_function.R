@@ -1,6 +1,6 @@
 
 
-# library(htmlTable)
+
 
 
 files <- list.files("utils/comparison_functions", full.names = TRUE, pattern = "\\.R$")
