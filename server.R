@@ -112,16 +112,12 @@ server <- function(input, output, session) {
 
   comparison_result <- reactiveVal(NULL)
 
-
   observeEvent(input$compare_btn, {
 
     req(dataset1)
     req(dataset2)
 
-
     if(input$unique_keys_check & valid_keys()){
-
-      print("Check")
       compare_list <- compareDatasets(dataset1(), dataset2(), input$key_vars)
     } else{
       compare_list <- compareDatasets(dataset1(), dataset2())
@@ -130,37 +126,43 @@ server <- function(input, output, session) {
     comparison_result(compare_list)
   })
 
-
-
-
   # Display the comparison result
   output$comparison_result <- renderPrint({
     comparison_result()
   })
 
+  #
+  # --- UI components
+  #
+  ##############################################################################
 
 
-  output$rows_comparison_html <- renderUI({
-    req(comparison_result()$row_count_diff)
+  output$row_count_check_output <- renderUI({
+    req(comparison_result()$row_count_check)
 
-    render_row_count_ui(
-      result = comparison_result()$row_count_diff,
+    row_count_check_ui(
+      result = comparison_result()$row_count_check,
       unique_keys = input$key_vars
     )
-
-    # comparison_result()$row_count_diff$html_output
   })
 
 
-  output$compare_columns_html <- renderUI({
-    req(comparison_result()$column_diff)
-    comparison_result()$column_diff$html_output
+  output$column_count_check_output <- renderUI({
+    req(comparison_result()$column_count_check)
+
+    column_count_check_ui(
+      result = comparison_result()$column_count_check,
+      unique_keys = input$key_vars
+    )
   })
 
 
-  output$rounding_check_html <- renderUI({
+  output$rounding_check_output <- renderUI({
     req(comparison_result()$rounding_check)
-    comparison_result()$rounding_check$html_output
+
+    rounding_check_ui(
+      result = comparison_result()$rounding_check
+    )
   })
 
 
@@ -170,41 +172,15 @@ server <- function(input, output, session) {
   ##############################################################################
 
   output$download_ui <- renderUI({
-    req(comparison_result()$html_report)  # Ensure report exists
+    # req(comparison_result()$html_report)  # Ensure report exists
     downloadButton("download_report", "Download HTML Report")
   })
 
   output$download_report <- downloadHandler(
-    # filename = function() {
-    #   "comparison_report.html"
-    # },
-    # content = function(file) {
-    #   writeLines(comparison_result()$html_report, file)
-    # }
-
-
-    # content = function(file) {
-    #   # Assume `report_widget` is a full HTML widget like a DT::datatable object
-    #   report_widget <- DT::datatable(head(iris), options = list(pageLength = 5))
-    #
-    #   # Save the widget with self-contained HTML
-    #   saveWidget(
-    #     widget = report_widget,
-    #     file = file,
-    #     selfcontained = TRUE
-    #   )
-    # }
 
     filename = function() {
       "comparison_report.html"
     },
-    # content = function(file) {
-    #   htmltools::save_html(
-    #     html = comparison_result()$html_report,
-    #     file = file,
-    #     background = "white"  # Optional
-    #   )
-    # }
     content = function(file) {
       # Save to a temporary file first
       temp_report <- tempfile(fileext = ".html")

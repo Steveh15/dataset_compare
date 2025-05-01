@@ -1,5 +1,8 @@
 
-compare_columns <- function(df1, df2, unique_keys = NULL) {
+column_count_check <- function(df1, df2, unique_keys = NULL) {
+
+
+
 
   columns1 <- data.frame(name = colnames(df1), type = sapply(df1, get_class))
   columns2 <- data.frame(name = colnames(df2), type = sapply(df2, get_class))
@@ -16,22 +19,31 @@ compare_columns <- function(df1, df2, unique_keys = NULL) {
     id = "compare_column_vars",
     in_df1_not_df2 = in_df1_not_df2,
     in_df2_not_df1 = in_df2_not_df1,
-    type_mismatches = type_mismatches,
-
-    html_output = tags$div(
-      tags$h3("Number of Columns comparison"),
-      tags$p(paste("Columns in Dataset 1 only: ", paste0(in_df1_not_df2, collapse = ", "))),
-      tags$p(paste("Columns in Dataset 2 only: ", paste0(in_df2_not_df1, collapse = ", "))),
-      tags$h4("Column type comparison"),
-      htmlTable(
-        type_mismatches,
-        rnames = FALSE,
-        css.cell = "padding: 5px; text-align: left;", # Cell styles
-        css.table = "border: 1px solid black; width: 40%;" # Table styles
-      )
-    )
+    type_mismatches = type_mismatches
   )
 
 
   return(diff)
 }
+
+
+
+column_count_check_ui <- function(result, unique_keys = NULL) {
+
+  html_output = tags$div(
+    tags$h3("Number of Columns comparison"),
+    tags$p(paste("Columns in Dataset 1 only: ", paste0(result$in_df1_not_df2, collapse = ", "))),
+    tags$p(paste("Columns in Dataset 2 only: ", paste0(result$in_df2_not_df1, collapse = ", "))),
+    tags$h4("Column type comparison"),
+    htmlTable(
+      result$type_mismatches,
+      rnames = FALSE,
+      css.cell = "padding: 5px; text-align: left;", # Cell styles
+      css.table = "border: 1px solid black; width: 40%;" # Table styles
+    )
+  )
+
+  return(html_output)
+
+}
+
