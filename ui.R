@@ -5,6 +5,3 @@ ui <- fluidPage(
   titlePanel("ADPP compare"),
   compare_ui
 )
-
-
-

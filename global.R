@@ -3,6 +3,7 @@ library(shiny)
 library(dplyr)
 library(stringr)
 library(shinyBS)
+library(htmlwidgets)
 
 # For testing
 library(pharmaverseadam)

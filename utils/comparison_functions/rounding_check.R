@@ -10,17 +10,17 @@ rounding_check <- function(df1, df2, unique_keys = NULL) {
       mutate(
         dp = get_decimal_places(AVAL)
       ) %>%
-      group_by(PPTESTCD) %>%
+      group_by(PARAMCD) %>%
       summarise(
         dp = max(dp)
       )
   )
 
 
-  dp_compare <- merge(dp_list[[1]], dp_list[[2]], by = "PPTESTCD", all = TRUE) %>%
+  dp_compare <- merge(dp_list[[1]], dp_list[[2]], by = "PARAMCD", all = TRUE) %>%
     filter(dp.x != dp.y)
 
-  names(dp_compare) <-c("PPTESTCD", "Dataset 1", "Dataset 2")
+  names(dp_compare) <-c("PARAMCD", "Dataset 1", "Dataset 2")
 
   list(
     dp_compare = dp_compare,
@@ -40,7 +40,7 @@ rounding_check <- function(df1, df2, unique_keys = NULL) {
         bsPopover(
           id = "info_box",  # Matches the ID above
           title = "Rounding Check",
-          content = "Explanation of rounding check",
+          content = "This check looks",
           placement = "right",
           trigger = "hover"
         )

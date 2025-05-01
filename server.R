@@ -142,7 +142,13 @@ server <- function(input, output, session) {
 
   output$rows_comparison_html <- renderUI({
     req(comparison_result()$row_count_diff)
-    comparison_result()$row_count_diff$html_output
+
+    render_row_count_ui(
+      result = comparison_result()$row_count_diff,
+      unique_keys = input$key_vars
+    )
+
+    # comparison_result()$row_count_diff$html_output
   })
 
 
@@ -169,11 +175,51 @@ server <- function(input, output, session) {
   })
 
   output$download_report <- downloadHandler(
+    # filename = function() {
+    #   "comparison_report.html"
+    # },
+    # content = function(file) {
+    #   writeLines(comparison_result()$html_report, file)
+    # }
+
+
+    # content = function(file) {
+    #   # Assume `report_widget` is a full HTML widget like a DT::datatable object
+    #   report_widget <- DT::datatable(head(iris), options = list(pageLength = 5))
+    #
+    #   # Save the widget with self-contained HTML
+    #   saveWidget(
+    #     widget = report_widget,
+    #     file = file,
+    #     selfcontained = TRUE
+    #   )
+    # }
+
     filename = function() {
       "comparison_report.html"
     },
+    # content = function(file) {
+    #   htmltools::save_html(
+    #     html = comparison_result()$html_report,
+    #     file = file,
+    #     background = "white"  # Optional
+    #   )
+    # }
     content = function(file) {
-      writeLines(comparison_result()$html_report, file)
+      # Save to a temporary file first
+      temp_report <- tempfile(fileext = ".html")
+
+      rmarkdown::render(
+        input = "report_template.Rmd",
+        output_file = temp_report,
+        params = list(
+          row_count_result = comparison_result()$row_count_diff
+        ),
+        envir = new.env(parent = globalenv())  # Prevents polluting global env
+      )
+
+      # Copy final report to the file Shiny wants to return
+      file.copy(temp_report, file, overwrite = TRUE)
     }
   )
 

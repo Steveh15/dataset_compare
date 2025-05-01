@@ -17,8 +17,8 @@ compare_ui <-  sidebarLayout(
   mainPanel(
 
     uiOutput("rows_comparison_html"),
-    uiOutput("compare_columns_html"),
-    uiOutput("rounding_check_html"),
+    # uiOutput("compare_columns_html"),
+    # uiOutput("rounding_check_html"),
 
   )
 )

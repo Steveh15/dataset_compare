@@ -1,0 +1,19 @@
+---
+title: "Dataset Comparison Report"
+output: html_document
+params:
+  row_count_result: NULL
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(htmltools)
+library(knitr)
+
+```
+
+## Number of Rows Check
+
+```{r row_count_check}
+render_row_count_report(params$row_count_result)
+```
