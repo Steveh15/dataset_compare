@@ -172,7 +172,7 @@ server <- function(input, output, session) {
   ##############################################################################
 
   output$download_ui <- renderUI({
-    # req(comparison_result()$html_report)  # Ensure report exists
+    req(comparison_result())  # Ensure report exists
     downloadButton("download_report", "Download HTML Report")
   })
 
@@ -189,7 +189,7 @@ server <- function(input, output, session) {
         input = "report_template.Rmd",
         output_file = temp_report,
         params = list(
-          row_count_result = comparison_result()$row_count_diff
+          row_count_result = comparison_result()$row_count_check
         ),
         envir = new.env(parent = globalenv())  # Prevents polluting global env
       )

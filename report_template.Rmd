@@ -15,5 +15,5 @@ library(knitr)
 ## Number of Rows Check
 
 ```{r row_count_check}
-render_row_count_report(params$row_count_result)
+row_count_check_markdown(params$row_count_result)
 ```

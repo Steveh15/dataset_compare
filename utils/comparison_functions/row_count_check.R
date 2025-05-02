@@ -51,26 +51,13 @@ row_count_check_ui <- function(result, unique_keys = NULL) {
     table_block <- NULL
   }
 
+
   tagList(summary_block, table_block)
+
 }
 
 row_count_check_markdown <- function(result) {
-  summary_block <- htmltools::tagList(
-    tags$h2("Number of Rows Comparison"),
-    tags$p(paste("Dataset 1 has", result$df1_rows, "rows.")),
-    tags$p(paste("Dataset 2 has", result$df2_rows, "rows.")),
-    tags$p(paste("Difference in number of rows:", result$row_diff))
-  )
+  row_count_check_ui(result)
 
-  if (!is.null(result$missing_rows)) {
-    table_block <- htmltools::tagList(
-      tags$h3("Record comparison"),
-      knitr::kable(result$missing_rows, format = "html")  # safe for .Rmd
-    )
-  } else {
-    table_block <- NULL
-  }
-
-  tagList(summary_block, table_block)
 }
 
