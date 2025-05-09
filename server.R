@@ -166,40 +166,6 @@ server <- function(input, output, session) {
   })
 
 
-  #
-  # --- Download button login
-  #
-  ##############################################################################
-
-  output$download_ui <- renderUI({
-    req(comparison_result())  # Ensure report exists
-    downloadButton("download_report", "Download HTML Report")
-  })
-
-  output$download_report <- downloadHandler(
-
-    filename = function() {
-      "comparison_report.html"
-    },
-    content = function(file) {
-      # Save to a temporary file first
-      temp_report <- tempfile(fileext = ".html")
-
-      rmarkdown::render(
-        input = "report_template.Rmd",
-        output_file = temp_report,
-        params = list(
-          row_count_result = comparison_result()$row_count_check,
-          column_count_result = comparison_result()$column_count_check,
-          rounding_result = comparison_result()$rounding_check
-        ),
-        envir = new.env(parent = globalenv())  # Prevents polluting global env
-      )
-
-      # Copy final report to the file Shiny wants to return
-      file.copy(temp_report, file, overwrite = TRUE)
-    }
-  )
 
 
   #
@@ -254,13 +220,13 @@ server <- function(input, output, session) {
   })
 
   output$column_count_check_comment_display <- renderUI({
-    if (nzchar(comments$row_count)) {
+    if (nzchar(comments$column_count)) {
       tags$div(tags$strong("Comment:"), tags$p(comments$column_count))
     }
   })
 
   output$rounding_check_comment_display <- renderUI({
-    if (nzchar(comments$row_count)) {
+    if (nzchar(comments$rounding)) {
       tags$div(tags$strong("Comment:"), tags$p(comments$rounding))
     }
   })
@@ -306,4 +272,41 @@ server <- function(input, output, session) {
   })
 
 
+  #
+  # --- Download button login
+  #
+  ##############################################################################
+
+  output$download_ui <- renderUI({
+    req(comparison_result())  # Ensure report exists
+    downloadButton("download_report", "Download HTML Report")
+  })
+
+  output$download_report <- downloadHandler(
+
+    filename = function() {
+      "comparison_report.html"
+    },
+    content = function(file) {
+      # Save to a temporary file first
+      temp_report <- tempfile(fileext = ".html")
+
+      rmarkdown::render(
+        input = "report_template.Rmd",
+        output_file = temp_report,
+        params = list(
+          row_count_result = comparison_result()$row_count_check,
+          column_count_result = comparison_result()$column_count_check,
+          rounding_result = comparison_result()$rounding_check,
+          comments = reactiveValuesToList(comments)
+        ),
+        envir = new.env(parent = globalenv())  # Prevents polluting global env
+      )
+
+      # Copy final report to the file Shiny wants to return
+      file.copy(temp_report, file, overwrite = TRUE)
+    }
+  )
 }
+
+

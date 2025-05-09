@@ -5,6 +5,7 @@ params:
   row_count_result: NULL
   column_count_result: NULL
   rounding_result: NULL
+  comments: NULL
 ---
 
 ```{r setup, include=FALSE}
@@ -16,8 +17,13 @@ library(knitr)
 
 ## Number of Rows Check
 
-```{r row_count_check}
+```{r row_count_check comments}
 row_count_check_markdown(params$row_count_result)
+
+if (nzchar(params$comments$row_count)) {
+  comment_text <- paste0("##### Comment\n\n", params$comments$row_count)
+  knitr::asis_output(comment_text)
+}
 ```
 
 
@@ -25,6 +31,11 @@ row_count_check_markdown(params$row_count_result)
 
 ```{r column_count_check}
 column_count_check_markdown(params$column_count_result)
+
+if (nzchar(params$comments$column_count)) {
+  comment_text <- paste0("##### Comment\n\n", params$comments$column_count)
+  knitr::asis_output(comment_text)
+}
 ```
 
 
@@ -32,4 +43,9 @@ column_count_check_markdown(params$column_count_result)
 
 ```{r rounding_check}
 rounding_check_markdown(params$rounding_result)
+
+if (nzchar(params$comments$rounding)) {
+  comment_text <- paste0("##### Comment\n\n", params$comments$rounding)
+  knitr::asis_output(comment_text)
+}
 ```
