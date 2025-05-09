@@ -31,7 +31,7 @@ column_count_check <- function(df1, df2, unique_keys = NULL) {
 column_count_check_ui <- function(result, unique_keys = NULL) {
 
   html_output = tags$div(
-    tags$h3("Number of Columns comparison"),
+    # tags$h3("Number of Columns comparison"),
     tags$p(paste("Columns in Dataset 1 only: ", paste0(result$in_df1_not_df2, collapse = ", "))),
     tags$p(paste("Columns in Dataset 2 only: ", paste0(result$in_df2_not_df1, collapse = ", "))),
     tags$h4("Column type comparison"),
@@ -46,4 +46,9 @@ column_count_check_ui <- function(result, unique_keys = NULL) {
   return(html_output)
 
 }
+
+column_count_check_markdown <- function(result) {
+  column_count_check_ui(result)
+}
+
 

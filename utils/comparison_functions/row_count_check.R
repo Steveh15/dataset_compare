@@ -29,7 +29,6 @@ row_count_check <- function(df1, df2, unique_keys = NULL) {
 
 row_count_check_ui <- function(result, unique_keys = NULL) {
   summary_block <- tags$div(
-    tags$h3("Number of Rows Comparison"),
     tags$p(paste("Dataset 1 has", result$df1_rows, "rows.")),
     tags$p(paste("Dataset 2 has", result$df2_rows, "rows.")),
     tags$p(paste("Difference in number of rows:", result$row_diff))
@@ -58,6 +57,5 @@ row_count_check_ui <- function(result, unique_keys = NULL) {
 
 row_count_check_markdown <- function(result) {
   row_count_check_ui(result)
-
 }
 

@@ -32,25 +32,25 @@ rounding_check_ui <- function(result) {
 
   html_output = tags$div(
 
-    tags$h3(
-      "Decimal Place Check",
-      tags$span(
-        id = "info_box",  # ID for the box to apply tooltip
-        style = "display: inline-block; border: 1px solid #007bff; padding: 4px 8px; border-radius: 4px; cursor: pointer;",
-        `data-toggle` = "tooltip",
-        `data-placement` = "top",
-        # title = "This is your tooltip text",  # Tooltip content
-        "\u2139"  # Unicode for the "i" icon
-      ),
-
-      bsPopover(
-        id = "info_box",  # Matches the ID above
-        title = "Rounding Check",
-        content = "This check looks",
-        placement = "right",
-        trigger = "hover"
-      )
-    ),
+    # tags$h3(
+    #   "Decimal Place Check",
+    #   tags$span(
+    #     id = "info_box",  # ID for the box to apply tooltip
+    #     style = "display: inline-block; border: 1px solid #007bff; padding: 4px 8px; border-radius: 4px; cursor: pointer;",
+    #     `data-toggle` = "tooltip",
+    #     `data-placement` = "top",
+    #     # title = "This is your tooltip text",  # Tooltip content
+    #     "\u2139"  # Unicode for the "i" icon
+    #   ),
+    #
+    #   bsPopover(
+    #     id = "info_box",  # Matches the ID above
+    #     title = "Rounding Check",
+    #     content = "This check looks",
+    #     placement = "right",
+    #     trigger = "hover"
+    #   )
+    # ),
 
     tags$p("The following parameters have different maximum decimal places"),
 
@@ -67,4 +67,9 @@ rounding_check_ui <- function(result) {
 
 }
 
+
+
+rounding_check_markdown <- function(result) {
+  rounding_check_ui(result)
+}
 

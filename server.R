@@ -189,7 +189,9 @@ server <- function(input, output, session) {
         input = "report_template.Rmd",
         output_file = temp_report,
         params = list(
-          row_count_result = comparison_result()$row_count_check
+          row_count_result = comparison_result()$row_count_check,
+          column_count_result = comparison_result()$column_count_check,
+          rounding_result = comparison_result()$rounding_check
         ),
         envir = new.env(parent = globalenv())  # Prevents polluting global env
       )
@@ -198,6 +200,110 @@ server <- function(input, output, session) {
       file.copy(temp_report, file, overwrite = TRUE)
     }
   )
+
+
+  #
+  # --- Comments
+  #
+  ##############################################################################
+
+  comments <- reactiveValues(
+    row_count = "",
+    column_count = "",
+    rounding = ""
+  )
+  active_comment_id <- reactiveVal(NULL)
+
+  comment_text <- reactiveVal(NULL)
+
+
+  output$report_block <- renderUI({
+    req(comparison_result())  # only proceeds when comparison_result is not NULL
+
+    mainPanel(
+      tags$h3(
+        "Number of Rows Comparison",
+        actionButton("row_count_check_comment_btn", "Edit Comment")
+      ),
+      uiOutput("row_count_check_output"),
+      uiOutput("row_count_check_comment_display"),
+
+
+
+      tags$h3(
+        "Number of Columns comparison",
+        actionButton("column_count_check_comment_btn", "Edit Comment")
+      ),
+      uiOutput("column_count_check_output"),
+      uiOutput("column_count_check_comment_display"),
+
+
+      tags$h3(
+        "Decimal Place Check",
+        actionButton("rounding_check_comment_btn", "Edit Comment")
+      ),
+      uiOutput("rounding_check_output"),
+      uiOutput("rounding_check_comment_display")
+    )
+  })
+
+  output$row_count_check_comment_display <- renderUI({
+    if (nzchar(comments$row_count)) {
+      tags$div(tags$strong("Comment:"), tags$p(comments$row_count))
+    }
+  })
+
+  output$column_count_check_comment_display <- renderUI({
+    if (nzchar(comments$row_count)) {
+      tags$div(tags$strong("Comment:"), tags$p(comments$column_count))
+    }
+  })
+
+  output$rounding_check_comment_display <- renderUI({
+    if (nzchar(comments$row_count)) {
+      tags$div(tags$strong("Comment:"), tags$p(comments$rounding))
+    }
+  })
+
+
+
+  observeEvent(input$row_count_check_comment_btn, {
+    active_comment_id("row_count")
+    showModal(comment_modal(comments$row_count))
+  })
+
+  observeEvent(input$column_count_check_comment_btn, {
+    active_comment_id("column_count")
+    showModal(comment_modal(comments$column_count))
+  })
+
+  observeEvent(input$rounding_check_comment_btn, {
+    active_comment_id("rounding")
+    showModal(comment_modal(comments$rounding))
+  })
+
+
+
+  comment_modal <- function(current_value) {
+    modalDialog(
+      title = "Edit Comment",
+      textAreaInput("comment_text", "Enter your comment:", value = current_value, width = "100%"),
+      footer = tagList(
+        modalButton("Cancel"),
+        actionButton("save_comment_btn", "Save")
+      ),
+      easyClose = TRUE
+    )
+  }
+
+  observeEvent(input$save_comment_btn, {
+    id <- active_comment_id()
+    # req(id, input$comment_text)
+    req(id, !is.null(input$comment_text))
+
+    comments[[id]] <- input$comment_text
+    removeModal()
+  })
 
 
 }

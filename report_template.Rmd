@@ -3,6 +3,8 @@ title: "Dataset Comparison Report"
 output: html_document
 params:
   row_count_result: NULL
+  column_count_result: NULL
+  rounding_result: NULL
 ---
 
 ```{r setup, include=FALSE}
@@ -16,4 +18,18 @@ library(knitr)
 
 ```{r row_count_check}
 row_count_check_markdown(params$row_count_result)
+```
+
+
+## Number of Columns comparison
+
+```{r column_count_check}
+column_count_check_markdown(params$column_count_result)
+```
+
+
+## Decimal Place Check
+
+```{r rounding_check}
+rounding_check_markdown(params$rounding_result)
 ```

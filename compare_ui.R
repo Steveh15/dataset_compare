@@ -9,16 +9,14 @@ compare_ui <-  sidebarLayout(
     uiOutput("validation_message"),
     uiOutput("key_selector_ui"),
     uiOutput("compare_btn_ui"),
-    uiOutput("download_ui")
+    uiOutput("download_ui"),
+
+    # uiOutput("comment_display"),
+    # actionButton("edit_comment_btn", "Edit Comment")
 
 
   ),
 
-  mainPanel(
+  uiOutput("report_block")
 
-    uiOutput("row_count_check_output"),
-    uiOutput("column_count_check_output"),
-    uiOutput("rounding_check_output")
-
-  )
 )
