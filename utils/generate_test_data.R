@@ -17,6 +17,24 @@ df2 <- df1_1[  -sample(1:nrow(df1_1), 25), ] %>%
   )
 
 
+samp1 <- sample(1:nrow(df2), 40)
+samp2 <- sample(1:nrow(df2), 30)
+# samp1 %>% sort()
+# samp2 %>% sort()
+#
+# samp1 %in% samp2
+# samp2 %in% samp1
+
+df2$AVAL[samp1] <- df2$AVAL[samp1]*runif(40, min = 0.5, max = 1.5)
+df2$edit <- NA
+df2$edit[samp1] <- 1
+
+
+# df2$AVAL[samp2] <- NA
+
+
+
+
 df1 <- df1_1[-sample(1:nrow(df1_1), 15), ] %>%
   select(-c(DMDY, TRTSDTM, TRTSTMF))
 
@@ -27,7 +45,7 @@ haven::write_xpt(df1, file.path("data", "df1.xpt"))
 haven::write_xpt(df2, file.path("data", "df2.xpt"))
 
 
-
-
-
-df2 %>% count(PPTESTCD)
+#
+#
+#
+# df2 %>% count(PPTESTCD)

@@ -109,16 +109,20 @@ server <- function(input, output, session) {
 
 
 
-
+  selected_keys <- reactiveVal(NULL)
   comparison_result <- reactiveVal(NULL)
+
 
   observeEvent(input$compare_btn, {
 
     req(dataset1)
     req(dataset2)
 
+
     if(input$unique_keys_check & valid_keys()){
-      compare_list <- compareDatasets(dataset1(), dataset2(), input$key_vars)
+
+      selected_keys(input$key_vars)
+      compare_list <- compareDatasets(dataset1(), dataset2(), selected_keys())
     } else{
       compare_list <- compareDatasets(dataset1(), dataset2())
     }
@@ -142,7 +146,7 @@ server <- function(input, output, session) {
 
     row_count_check_ui(
       result = comparison_result()$row_count_check,
-      unique_keys = input$key_vars
+      unique_keys = selected_keys()
     )
   })
 
@@ -152,16 +156,24 @@ server <- function(input, output, session) {
 
     column_count_check_ui(
       result = comparison_result()$column_count_check,
-      unique_keys = input$key_vars
+      unique_keys = selected_keys()
     )
   })
-
 
   output$rounding_check_output <- renderUI({
     req(comparison_result()$rounding_check)
 
     rounding_check_ui(
       result = comparison_result()$rounding_check
+    )
+  })
+
+  output$value_check_output <- renderUI({
+    req(comparison_result()$value_check)
+
+    value_check_ui(
+      result = comparison_result()$value_check,
+      unique_keys = selected_keys()
     )
   })
 
@@ -176,7 +188,8 @@ server <- function(input, output, session) {
   comments <- reactiveValues(
     row_count = "",
     column_count = "",
-    rounding = ""
+    rounding = "",
+    value = ""
   )
   active_comment_id <- reactiveVal(NULL)
 
@@ -209,7 +222,16 @@ server <- function(input, output, session) {
         actionButton("rounding_check_comment_btn", "Edit Comment")
       ),
       uiOutput("rounding_check_output"),
-      uiOutput("rounding_check_comment_display")
+      uiOutput("rounding_check_comment_display"),
+
+
+
+      tags$h3(
+        "Values Check",
+        actionButton("value_check_comment_btn", "Edit Comment")
+      ),
+      uiOutput("value_check_output"),
+      uiOutput("value_check_comment_display")
     )
   })
 
@@ -231,6 +253,13 @@ server <- function(input, output, session) {
     }
   })
 
+  output$value_check_comment_display <- renderUI({
+    if (nzchar(comments$value)) {
+      tags$div(tags$strong("Comment:"), tags$p(comments$value))
+    }
+  })
+
+
 
 
   observeEvent(input$row_count_check_comment_btn, {
@@ -246,6 +275,11 @@ server <- function(input, output, session) {
   observeEvent(input$rounding_check_comment_btn, {
     active_comment_id("rounding")
     showModal(comment_modal(comments$rounding))
+  })
+
+  observeEvent(input$value_check_comment_btn, {
+    active_comment_id("value")
+    showModal(comment_modal(comments$value))
   })
 
 
@@ -295,10 +329,13 @@ server <- function(input, output, session) {
         input = "report_template.Rmd",
         output_file = temp_report,
         params = list(
+          unique_keys = selected_keys(),
           row_count_result = comparison_result()$row_count_check,
           column_count_result = comparison_result()$column_count_check,
           rounding_result = comparison_result()$rounding_check,
+          value_result = comparison_result()$value_check,
           comments = reactiveValuesToList(comments)
+
         ),
         envir = new.env(parent = globalenv())  # Prevents polluting global env
       )

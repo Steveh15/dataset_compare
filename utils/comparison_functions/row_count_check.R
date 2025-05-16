@@ -55,7 +55,7 @@ row_count_check_ui <- function(result, unique_keys = NULL) {
 
 }
 
-row_count_check_markdown <- function(result) {
-  row_count_check_ui(result)
+row_count_check_markdown <- function(result, unique_keys = NULL) {
+  row_count_check_ui(result, unique_keys)
 }
 

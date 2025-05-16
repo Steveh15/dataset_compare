@@ -22,6 +22,7 @@ rounding_check <- function(df1, df2) {
   names(dp_compare) <-c("PARAMCD", "Dataset 1", "Dataset 2")
 
   list(
+    id = "rounding_check",
     dp_compare = dp_compare
   )
 

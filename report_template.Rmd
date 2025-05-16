@@ -2,9 +2,11 @@
 title: "Dataset Comparison Report"
 output: html_document
 params:
+  unique_keys: NULL
   row_count_result: NULL
   column_count_result: NULL
   rounding_result: NULL
+  value_result: NULL
   comments: NULL
 ---
 
@@ -18,7 +20,7 @@ library(knitr)
 ## Number of Rows Check
 
 ```{r row_count_check comments}
-row_count_check_markdown(params$row_count_result)
+row_count_check_markdown(params$row_count_result, params$unique_keys)
 
 if (nzchar(params$comments$row_count)) {
   comment_text <- paste0("##### Comment\n\n", params$comments$row_count)
@@ -49,3 +51,16 @@ if (nzchar(params$comments$rounding)) {
   knitr::asis_output(comment_text)
 }
 ```
+
+
+## Value Check
+
+```{r value_check}
+value_check_markdown(params$value_result, params$unique_keys)
+
+if (nzchar(params$comments$value)) {
+  comment_text <- paste0("##### Comment\n\n", params$comments$value)
+  knitr::asis_output(comment_text)
+}
+```
+
