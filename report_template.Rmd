@@ -18,10 +18,10 @@ library(knitr)
 ```
 
 ```{r unique_keys}
-  if (!is.null(unique_keys)) {
+  if (!is.null(params$unique_keys)) {
     tagList(
       tags$h5("Unique Keys"),
-      tags$p(paste(unique_keys, collapse = ", "))
+      tags$p(paste(params$unique_keys, collapse = ", "))
       )
   }
 

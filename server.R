@@ -332,8 +332,11 @@ server <- function(input, output, session) {
 
   output$download_report <- downloadHandler(
 
+
+
     filename = function() {
-      "comparison_report.html"
+      # "comparison_report.html"
+      paste0("adpp_comparison_report_",format(Sys.Date(), "%Y_%m_%d"), "T", format(Sys.time(), "%H_%M"), ".html")
     },
     content = function(file) {
       # Save to a temporary file first

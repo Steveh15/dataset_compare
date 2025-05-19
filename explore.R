@@ -2,6 +2,17 @@
 
 
 
+
+date() %>% format("%Y")
+
+Sys.Date()
+
+paste0("adpp_comparison_report_",format(Sys.Date(), "%Y_%m_%d"), "T", format(Sys.time(), "%H_%M"))
+
+
+
+
+
 ################################################################
 #
 # --- Test area
