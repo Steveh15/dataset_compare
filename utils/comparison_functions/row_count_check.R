@@ -1,5 +1,5 @@
 
-library(htmltools)
+
 
 row_count_check <- function(df1, df2, unique_keys = NULL) {
   df1_rows <- nrow(df1)

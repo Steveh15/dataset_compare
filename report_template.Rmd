@@ -1,5 +1,5 @@
 ---
-title: "Dataset Comparison Report"
+title: "ADPP Dataset Comparison Report"
 output: html_document
 params:
   unique_keys: NULL
@@ -8,6 +8,8 @@ params:
   rounding_result: NULL
   value_result: NULL
   comments: NULL
+  date_time: NULL
+  datasets: NULL
 ---
 
 ```{r setup, include=FALSE}
@@ -18,16 +20,14 @@ library(knitr)
 ```
 
 ```{r unique_keys}
-  if (!is.null(params$unique_keys)) {
-    tagList(
-      tags$h5("Unique Keys"),
-      tags$p(paste(params$unique_keys, collapse = ", "))
+      report_metadata_ui(
+        comparison_date = params$date_time$date,
+        comparison_time = params$date_time$time,
+        dataset1_name = params$datasets$dataset1_name,
+        dataset2_name = params$datasets$dataset2_name,
+        selected_keys = params$unique_keys
       )
-  }
-
 ```
-
-
 
 
 ## Number of Rows Check

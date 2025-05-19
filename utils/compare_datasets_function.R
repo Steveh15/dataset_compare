@@ -35,3 +35,43 @@ compareDatasets <- function(df1, df2, unique_keys = NULL) {
 
   return(results)
 }
+
+
+
+
+report_metadata_ui <- function(
+    comparison_date,
+    comparison_time,
+    dataset1_name,
+    dataset2_name,
+    selected_keys = NULL) {
+  tagList(
+    tags$h4("Report Metadata"),
+
+    tags$table(style = "width: auto; margin-bottom: 1em;", tags$tbody(
+      tags$tr(
+        tags$th("Generated:", style = "text-align: left; padding-right: 10px;"),
+
+        tags$td(paste0(format(comparison_date, "%d-%b-%Y"), " ", format(comparison_time, "%H:%M")))
+
+      ),
+      tags$tr(
+        tags$th("Dataset 1:", style = "text-align: left; padding-right: 10px;"),
+        tags$td(dataset1_name)
+      ),
+      tags$tr(
+        tags$th("Dataset 2:", style = "text-align: left; padding-right: 10px;"),
+        tags$td(dataset2_name)
+      ),
+      tags$tr(
+        tags$th("Unique Keys:", style = "text-align: left; padding-right: 10px;"),
+        tags$td(if (!is.null(selected_keys) &&
+                    length(selected_keys) > 0) {
+          paste(selected_keys, collapse = ", ")
+        } else {
+          tags$em("No unique keys defined")
+        })
+      )
+    ))
+  )
+}

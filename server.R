@@ -1,11 +1,10 @@
 
+
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
-
   # Reactive values to hold the datasets
   dataset1 <- reactive({
-
-    if(input$load_test_data){
+    if (input$load_test_data) {
       return (df1)
     }
     else if (is.null(input$dataset1)) {
@@ -16,8 +15,7 @@ server <- function(input, output, session) {
   })
 
   dataset2 <- reactive({
-
-    if(input$load_test_data){
+    if (input$load_test_data) {
       return (df2)
     }
     else if (is.null(input$dataset2)) {
@@ -29,9 +27,10 @@ server <- function(input, output, session) {
 
 
   output$compare_btn_ui <- renderUI({
-
     # Disable if datasets don't exist, or if unique keys have been requested but the keys aren't valid
-    if (is.null(dataset1()) || is.null(dataset2()) || (input$unique_keys_check & !valid_keys())  ) {
+    if (is.null(dataset1()) ||
+        is.null(dataset2()) ||
+        (input$unique_keys_check & !valid_keys())) {
       actionButton("compare_btn", "Compare Datasets", disabled = TRUE)
     } else {
       # Both datasets are present, enable the button
@@ -55,17 +54,25 @@ server <- function(input, output, session) {
   # Dynamically render dropdown menus for selecting keys
   output$key_selector_ui <- renderUI({
     req(input$unique_keys_check)
-    selectInput("key_vars", label = NULL,
-                choices = common_vars(), multiple = TRUE)
+    selectInput(
+      "key_vars",
+      label = NULL,
+      choices = common_vars(),
+      multiple = TRUE
+    )
   })
 
 
   valid_keys <- reactive({
-
-    if(is.null(dataset1()) || is.null(dataset2()) || (is.null(input$key_vars) || length(input$key_vars) == 0) ){
+    if (is.null(dataset1()) ||
+        is.null(dataset2()) ||
+        (is.null(input$key_vars) || length(input$key_vars) == 0)) {
       return(FALSE)
     } else{
-      return(check_keys(dataset1(), keys = input$key_vars) & check_keys(dataset2(), keys = input$key_vars))
+      return(
+        check_keys(dataset1(), keys = input$key_vars) &
+          check_keys(dataset2(), keys = input$key_vars)
+      )
     }
 
   })
@@ -74,29 +81,28 @@ server <- function(input, output, session) {
   output$validation_message <- renderUI({
     req(input$unique_keys_check, dataset1(), dataset2())
 
-    if(is.null(input$key_vars) || length(input$key_vars) == 0){
+    if (is.null(input$key_vars) || length(input$key_vars) == 0) {
       msg <- tags$b("Select Key Variables: ")
     } else{
-
       check1 <- check_keys(dataset1(), keys = input$key_vars)
       check2 <- check_keys(dataset2(), keys = input$key_vars)
 
-      if(check1 & check2){
+      if (check1 & check2) {
         msg <-  tagList(
           tags$b("Select Key Variables: "),
           tags$span(style = "color: green;", "Keys are valid")
         )
-      } else if(!check1 & !check2){
+      } else if (!check1 & !check2) {
         msg <-  tagList(
           tags$b("Select Key Variables: "),
           tags$span(style = "color: red;", "Keys do not define unique rows in either dataset")
         )
-      } else if(check1 & !check2){
+      } else if (check1 & !check2) {
         msg <-  tagList(
           tags$b("Select Key Variables: "),
           tags$span(style = "color: red;", "Keys do not define unique rows in dataset 2")
         )
-      } else if(!check1 & check2){
+      } else if (!check1 & check2) {
         msg <-  tagList(
           tags$b("Select Key Variables: "),
           tags$span(style = "color: red;", "Keys do not define unique rows in dataset 1")
@@ -112,24 +118,29 @@ server <- function(input, output, session) {
 
 
 
-  comparison_result <- reactiveVal(NULL)
 
+
+  comparison_result <- reactiveVal(NULL)
+  # comparisonDate <- reactiveVal(NULL)
+  comparisonDate <- reactiveValues(
+    date = "",
+    time = ""
+  )
 
   observeEvent(input$compare_btn, {
-
     req(dataset1)
     req(dataset2)
 
 
-    if(input$unique_keys_check & valid_keys()){
-
+    if (input$unique_keys_check & valid_keys()) {
       selected_keys(input$key_vars)
       compare_list <- compareDatasets(dataset1(), dataset2(), selected_keys())
     } else{
       selected_keys(NULL)
       compare_list <- compareDatasets(dataset1(), dataset2())
     }
-
+    comparisonDate$date <- Sys.Date()
+    comparisonDate$time <- Sys.time()
     comparison_result(compare_list)
   })
 
@@ -147,37 +158,29 @@ server <- function(input, output, session) {
   output$row_count_check_output <- renderUI({
     req(comparison_result()$row_count_check)
 
-    row_count_check_ui(
-      result = comparison_result()$row_count_check,
-      unique_keys = selected_keys()
-    )
+    row_count_check_ui(result = comparison_result()$row_count_check,
+                       unique_keys = selected_keys())
   })
 
 
   output$column_count_check_output <- renderUI({
     req(comparison_result()$column_count_check)
 
-    column_count_check_ui(
-      result = comparison_result()$column_count_check,
-      unique_keys = selected_keys()
-    )
+    column_count_check_ui(result = comparison_result()$column_count_check,
+                          unique_keys = selected_keys())
   })
 
   output$rounding_check_output <- renderUI({
     req(comparison_result()$rounding_check)
 
-    rounding_check_ui(
-      result = comparison_result()$rounding_check
-    )
+    rounding_check_ui(result = comparison_result()$rounding_check)
   })
 
   output$value_check_output <- renderUI({
     req(comparison_result()$value_check)
 
-    value_check_ui(
-      result = comparison_result()$value_check,
-      unique_keys = selected_keys()
-    )
+    value_check_ui(result = comparison_result()$value_check,
+                   unique_keys = selected_keys())
   })
 
 
@@ -199,20 +202,33 @@ server <- function(input, output, session) {
   comment_text <- reactiveVal(NULL)
 
 
+
+
+
   output$report_block <- renderUI({
     req(comparison_result())  # only proceeds when comparison_result is not NULL
 
+
+
     mainPanel(
 
-      tagList(
 
 
-        if (!is.null(selected_keys())) {
-          tagList(
-            tags$h5("Unique Keys"),
-            tags$p(paste(selected_keys(), collapse = ", "))
-          )
-        }),
+      # tagList(if (!is.null(selected_keys())) {
+      #   tagList(tags$h5("Unique Keys"), tags$p(paste(selected_keys(), collapse = ", ")))
+      # })
+
+
+
+      report_metadata_ui(
+        comparison_date = comparisonDate$date,
+        comparison_time = comparisonDate$time,
+        dataset1_name = input$dataset1$name,
+        dataset2_name = input$dataset2$name,
+        selected_keys = selected_keys()
+      )
+
+      ,
 
       tags$h3(
         "Number of Rows Comparison",
@@ -257,7 +273,8 @@ server <- function(input, output, session) {
 
   output$column_count_check_comment_display <- renderUI({
     if (nzchar(comments$column_count)) {
-      tags$div(tags$strong("Comment:"), tags$p(comments$column_count))
+      tags$div(tags$strong("Comment:"),
+               tags$p(comments$column_count))
     }
   })
 
@@ -301,7 +318,12 @@ server <- function(input, output, session) {
   comment_modal <- function(current_value) {
     modalDialog(
       title = "Edit Comment",
-      textAreaInput("comment_text", "Enter your comment:", value = current_value, width = "100%"),
+      textAreaInput(
+        "comment_text",
+        "Enter your comment:",
+        value = current_value,
+        width = "100%"
+      ),
       footer = tagList(
         modalButton("Cancel"),
         actionButton("save_comment_btn", "Save")
@@ -331,12 +353,9 @@ server <- function(input, output, session) {
   })
 
   output$download_report <- downloadHandler(
-
-
-
     filename = function() {
-      # "comparison_report.html"
-      paste0("adpp_comparison_report_",format(Sys.Date(), "%Y_%m_%d"), "T", format(Sys.time(), "%H_%M"), ".html")
+      "comparison_report.html"
+      # paste0("adpp_comparison_report_",format(Sys.Date(), "%Y_%m_%d"),"T",format(Sys.time(), "%H_%M"),".html")
     },
     content = function(file) {
       # Save to a temporary file first
@@ -351,7 +370,9 @@ server <- function(input, output, session) {
           column_count_result = comparison_result()$column_count_check,
           rounding_result = comparison_result()$rounding_check,
           value_result = comparison_result()$value_check,
-          comments = reactiveValuesToList(comments)
+          comments = reactiveValuesToList(comments),
+          date_time = reactiveValuesToList(comparisonDate),
+          datasets = list(dataset1_name = input$dataset1$name, dataset2_name = input$dataset2$name)
 
         ),
         envir = new.env(parent = globalenv())  # Prevents polluting global env
@@ -362,5 +383,3 @@ server <- function(input, output, session) {
     }
   )
 }
-
-
