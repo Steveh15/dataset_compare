@@ -17,6 +17,19 @@ library(knitr)
 
 ```
 
+```{r unique_keys}
+  if (!is.null(unique_keys)) {
+    tagList(
+      tags$h5("Unique Keys"),
+      tags$p(paste(unique_keys, collapse = ", "))
+      )
+  }
+
+```
+
+
+
+
 ## Number of Rows Check
 
 ```{r row_count_check comments}

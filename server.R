@@ -212,7 +212,6 @@ server <- function(input, output, session) {
             tags$h5("Unique Keys"),
             tags$p(paste(selected_keys(), collapse = ", "))
           )
-          # tags$h2("Number of ASdsadasd")
         }),
 
       tags$h3(
