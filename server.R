@@ -49,6 +49,9 @@ server <- function(input, output, session) {
   })
 
 
+  selected_keys <- reactiveVal(NULL)
+
+
   # Dynamically render dropdown menus for selecting keys
   output$key_selector_ui <- renderUI({
     req(input$unique_keys_check)
@@ -109,7 +112,6 @@ server <- function(input, output, session) {
 
 
 
-  selected_keys <- reactiveVal(NULL)
   comparison_result <- reactiveVal(NULL)
 
 
@@ -124,6 +126,7 @@ server <- function(input, output, session) {
       selected_keys(input$key_vars)
       compare_list <- compareDatasets(dataset1(), dataset2(), selected_keys())
     } else{
+      selected_keys(NULL)
       compare_list <- compareDatasets(dataset1(), dataset2())
     }
 
@@ -200,6 +203,18 @@ server <- function(input, output, session) {
     req(comparison_result())  # only proceeds when comparison_result is not NULL
 
     mainPanel(
+
+      tagList(
+
+
+        if (!is.null(selected_keys())) {
+          tagList(
+            tags$h5("Unique Keys"),
+            tags$p(paste(selected_keys(), collapse = ", "))
+          )
+          # tags$h2("Number of ASdsadasd")
+        }),
+
       tags$h3(
         "Number of Rows Comparison",
         actionButton("row_count_check_comment_btn", "Edit Comment")

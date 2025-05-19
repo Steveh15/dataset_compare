@@ -9,6 +9,7 @@ compare_ui <-  sidebarLayout(
     uiOutput("validation_message"),
     uiOutput("key_selector_ui"),
     uiOutput("compare_btn_ui"),
+    tags$div(style = "margin-top: 20px;"),
     uiOutput("download_ui"),
 
     # uiOutput("comment_display"),

@@ -69,33 +69,3 @@ value_check_ui <- function(result, unique_keys = NULL) {
 value_check_markdown <- function(result, unique_keys = NULL) {
   value_check_ui(result, unique_keys)
 }
-
-
-#
-# df1
-# df2
-# unique_keys <-c("USUBJID", "ID")
-#
-#
-# check1 <- df1 %>% select(all_of(unique_keys), AVAL)
-# check2 <- df2 %>% select(all_of(unique_keys), AVAL, edit)
-#
-# tolerance <- 1e-3
-#
-# test <- check1 %>%
-#   full_join(check2, by = unique_keys) %>%
-#   mutate(
-#     # test = AVAL.x == AVAL.y,
-#
-#     # AVAL.y = 100000,
-#     # abs_diff = abs(AVAL.x - AVAL.y),
-#     tolcheck = abs(AVAL.x - AVAL.y) > tolerance,
-#     miss_check = (is.na(AVAL.x) & !is.na(AVAL.y)) | (is.na(AVAL.y) & !is.na(AVAL.x))
-#     ) %>%
-#   filter(tolcheck | miss_check | edit) %>%
-#   # filter(is.na(AVAL.x) | is.na(AVAL.y)) %>%
-#   # filter(miss_check) %>%
-#   print()
-
-
-
