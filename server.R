@@ -2,6 +2,19 @@
 
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
+
+  observe({
+    if (!dev_mode) {
+      shinyjs::hide("load_test_data_wrapper")
+    } else {
+      shinyjs::show("load_test_data_wrapper")
+    }
+  })
+
+
+
+
+
   # Reactive values to hold the datasets
   dataset1 <- reactive({
     if (input$load_test_data) {
@@ -210,7 +223,7 @@ server <- function(input, output, session) {
 
 
 
-    mainPanel(
+    tagList(
 
 
 
