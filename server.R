@@ -132,6 +132,7 @@ server <- function(input, output, session) {
 
 
 
+  comparison_data <- reactiveVal(NULL)
 
   comparison_result <- reactiveVal(NULL)
   # comparisonDate <- reactiveVal(NULL)
@@ -145,6 +146,7 @@ server <- function(input, output, session) {
     req(dataset2)
 
 
+
     if (input$unique_keys_check & valid_keys()) {
       selected_keys(input$key_vars)
       compare_list <- compareDatasets(dataset1(), dataset2(), selected_keys())
@@ -154,6 +156,7 @@ server <- function(input, output, session) {
     }
     comparisonDate$date <- Sys.Date()
     comparisonDate$time <- Sys.time()
+    comparison_data(list(dataset1, dataset2))
     comparison_result(compare_list)
   })
 
@@ -205,6 +208,7 @@ server <- function(input, output, session) {
   ##############################################################################
 
   comments <- reactiveValues(
+    structure_and_content = "",
     row_count = "",
     column_count = "",
     rounding = "",
@@ -227,11 +231,6 @@ server <- function(input, output, session) {
     tagList(
 
 
-
-      # tagList(if (!is.null(selected_keys())) {
-      #   tagList(tags$h5("Unique Keys"), tags$p(paste(selected_keys(), collapse = ", ")))
-      # })
-
       tags$h1("ADPP/ADPP-like comparison report"),
 
       tags$h2("Comparison Run Information"),
@@ -244,12 +243,23 @@ server <- function(input, output, session) {
         selected_keys = selected_keys()
       ),
 
-      tags$h2("Structural Checks"),
+      tags$hr(style = "border-top: 2px solid #888; margin-top: 20px; margin-bottom: 20px;"),
 
-      structure_content_check_html(dataset1(), dataset2()),
+      tags$h2("Structure and Content Checks"),
+
+      # structure_content_check_html(dataset1(), dataset2()),
+      comparison_result()$results_structure_ui,
+
+      tags$h3("Structure and Content Checks Comment", actionButton("structure_and_content_btn", "Edit Comment")),
+      uiOutput("structure_and_content_display"),
+
+      tags$hr(style = "border-top: 2px solid #888; margin-top: 20px; margin-bottom: 20px;"),
+
+      tags$h2("Row-Level Checks"),
 
 
 
+      tags$hr(),
       tags$h1("Old Stuff"),
       tags$h3(
         "Number of Rows Comparison",
@@ -289,6 +299,22 @@ server <- function(input, output, session) {
     )
   })
 
+  # --- Stucture and Content checks comment ####################################
+
+
+  output$structure_and_content_display <- renderUI({
+    if (nzchar(comments$structure_and_content)) {
+      tags$div(tags$strong("Comment:"), tags$p(comments$structure_and_content))
+    }
+  })
+
+
+  observeEvent(input$structure_and_content_btn, {
+    active_comment_id("structure_and_content")
+    showModal(comment_modal(comments$structure_and_content))
+  })
+
+  ##############################################################################
   output$row_count_check_comment_display <- renderUI({
     if (nzchar(comments$row_count)) {
       tags$div(tags$strong("Comment:"), tags$p(comments$row_count))
@@ -390,6 +416,7 @@ server <- function(input, output, session) {
         output_file = temp_report,
         params = list(
           unique_keys = selected_keys(),
+          comparison_result = comparison_result(),
           row_count_result = comparison_result()$row_count_check,
           column_count_result = comparison_result()$column_count_check,
           rounding_result = comparison_result()$rounding_check,

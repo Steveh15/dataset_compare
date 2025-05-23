@@ -25,6 +25,11 @@ df2$edit <- NA
 df2$edit[samp1] <- 1
 
 
+
+df2 <- df2 %>% mutate(
+  AVAL = round(AVAL, 3)
+)
+
 # df2$AVAL[samp2] <- NA
 
 

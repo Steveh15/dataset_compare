@@ -7,24 +7,18 @@ files <- list.files("utils/comparison_functions", full.names = TRUE, pattern = "
 sapply(files, source)
 
 
-generate_html_content <- function(...) {
-  htmltools::tagList(
-    tags$html(
-      tags$head(
-        tags$title("Comparison Report")
-      ),
-      tags$body(
-        tags$h1("Dataset Comparison Report"),
-        tags$h4(paste("Generated:", date())),
-        ...
-      )
-    )
-  )
-}
-
-
 compareDatasets <- function(df1, df2, unique_keys = NULL) {
   results <- list()
+
+
+  results$adpp <- df1
+  results$adpp_like <- df2
+
+  results$key_variables <- unique_keys
+
+  results$results_structure_ui <- structure_content_check_html(df1,df2)
+
+
 
 
   results$row_count_check <- row_count_check(df1, df2, unique_keys)

@@ -1,14 +1,12 @@
 
 
-
-
-rounding_check <- function(df1, df2) {
+rounding_check_new <- function(df1, df2, precision = 10) {
 
   dp_list <- list(df1, df2) %>% lapply(function(x)
     x %>%
       rowwise() %>%
       mutate(
-        dp = get_decimal_places(AVAL)
+        dp = get_decimal_places(AVAL, precision = precision)
       ) %>%
       group_by(PARAMCD) %>%
       summarise(
@@ -19,7 +17,30 @@ rounding_check <- function(df1, df2) {
   dp_compare <- merge(dp_list[[1]], dp_list[[2]], by = "PARAMCD", all = TRUE) %>%
     filter(dp.x != dp.y)
 
-  names(dp_compare) <-c("PARAMCD", "Dataset 1", "Dataset 2")
+  names(dp_compare) <-c("PARAMCD", "ADPP", "ADPP-like")
+
+  return(dp_compare)
+
+}
+
+rounding_check <- function(df1, df2) {
+
+  dp_list <- list(df1, df2) %>% lapply(function(x)
+    x %>%
+      rowwise() %>%
+      mutate(
+        dp = get_decimal_places(AVAL, precision = 10)
+      ) %>%
+      group_by(PARAMCD) %>%
+      summarise(
+        dp = max(dp)
+      )
+  )
+
+  dp_compare <- merge(dp_list[[1]], dp_list[[2]], by = "PARAMCD", all = TRUE) %>%
+    filter(dp.x != dp.y)
+
+  names(dp_compare) <-c("PARAMCD", "ADPP", "ADPP-like")
 
   list(
     id = "rounding_check",

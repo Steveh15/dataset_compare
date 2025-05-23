@@ -6,7 +6,7 @@ library(shinyBS)
 library(htmlwidgets)
 
 # For testing
-library(pharmaverseadam)
+# library(pharmaverseadam)
 
 # library(shinyBS)
 library(DT)
