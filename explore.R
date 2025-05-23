@@ -7,6 +7,13 @@ keys = c("USUBJID", "ID")
 
 c1 <- arsenal::comparedf(df1, df2)
 
+c1
+
+c1$frame.summary
+
+
+c1$vars.summary
+
 c2 <- arsenal::comparedf(df1, df2, by = keys)
 
 

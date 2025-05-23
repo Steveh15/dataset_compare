@@ -34,10 +34,15 @@ df1 <- df1_1[-sample(1:nrow(df1_1), 15), ] %>%
   select(-c(DMDY, TRTSDTM, TRTSTMF))
 
 
-
+test1_1 <- df1
+test1_2 <- df1
 
 haven::write_xpt(df1, file.path("data", "df1.xpt"))
 haven::write_xpt(df2, file.path("data", "df2.xpt"))
+
+
+haven::write_xpt(test1_1, file.path("data", "test1_1.xpt"))
+haven::write_xpt(test1_2, file.path("data", "test1_2.xpt"))
 
 
 #

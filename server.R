@@ -218,6 +218,7 @@ server <- function(input, output, session) {
 
 
 
+
   output$report_block <- renderUI({
     req(comparison_result())  # only proceeds when comparison_result is not NULL
 
@@ -245,6 +246,11 @@ server <- function(input, output, session) {
 
       tags$h2("Structural Checks"),
 
+      structure_content_check_html(dataset1(), dataset2()),
+
+
+
+      tags$h1("Old Stuff"),
       tags$h3(
         "Number of Rows Comparison",
         actionButton("row_count_check_comment_btn", "Edit Comment")
