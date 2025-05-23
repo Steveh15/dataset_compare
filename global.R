@@ -15,7 +15,7 @@ library(htmlTable)
 
 source("utils/generate_test_data.R")
 
-dev_mode <- FALSE
+dev_mode <- TRUE
 
 
 # df1 <- haven::read_xpt(file.path("data", "df1.xpt"))

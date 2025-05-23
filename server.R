@@ -231,7 +231,9 @@ server <- function(input, output, session) {
       #   tagList(tags$h5("Unique Keys"), tags$p(paste(selected_keys(), collapse = ", ")))
       # })
 
+      tags$h1("ADPP/ADPP-like comparison report"),
 
+      tags$h2("Comparison Run Information"),
 
       report_metadata_ui(
         comparison_date = comparisonDate$date,
@@ -239,9 +241,9 @@ server <- function(input, output, session) {
         dataset1_name = input$dataset1$name,
         dataset2_name = input$dataset2$name,
         selected_keys = selected_keys()
-      )
+      ),
 
-      ,
+      tags$h2("Structural Checks"),
 
       tags$h3(
         "Number of Rows Comparison",
@@ -259,6 +261,9 @@ server <- function(input, output, session) {
       uiOutput("column_count_check_output"),
       uiOutput("column_count_check_comment_display"),
 
+      tags$h2("Content Checks"),
+
+      tags$h2("Row-Level Checks"),
 
       tags$h3(
         "Decimal Place Check",

@@ -2,6 +2,20 @@
 
 
 
+keys = c("USUBJID", "ID")
+
+
+c1 <- arsenal::comparedf(df1, df2)
+
+c2 <- arsenal::comparedf(df1, df2, by = keys)
+
+
+summary(c1)
+
+
+
+
+
 
 date() %>% format("%Y")
 

@@ -46,7 +46,6 @@ report_metadata_ui <- function(
     dataset2_name,
     selected_keys = NULL) {
   tagList(
-    tags$h4("Report Metadata"),
 
     tags$table(style = "width: auto; margin-bottom: 1em;", tags$tbody(
       tags$tr(
