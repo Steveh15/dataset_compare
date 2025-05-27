@@ -257,7 +257,24 @@ server <- function(input, output, session) {
 
       tags$h2("Row-Level Checks"),
 
+    if(is.null(comparison_result()$unique_keys)){
+      tags$p("Unique keys have not been defined. No row-level checks have been performed")
+    } else{
+      tagList(
+        tags$p("Unique keys have been defined"),
+        comparison_result()$results_row_level_ui
+      )
+    },
 
+    tags$h2("AVAL comparison"),
+
+    tags$h3("Summary"),
+
+    tags$h3("AVAL differences table"),
+
+
+
+################################################################################
 
       tags$hr(),
       tags$h1("Old Stuff"),

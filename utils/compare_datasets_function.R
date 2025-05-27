@@ -14,9 +14,17 @@ compareDatasets <- function(df1, df2, unique_keys = NULL) {
   results$adpp <- df1
   results$adpp_like <- df2
 
-  results$key_variables <- unique_keys
+  results$unique_keys <- unique_keys
 
   results$results_structure_ui <- structure_content_check_html(df1,df2)
+
+  if(!is.null(unique_keys)){
+    results$results_row_level_ui <- row_level_checks_html(df1, df2, unique_keys = unique_keys)
+  } else{
+    results$results_row_level_ui <- NULL
+  }
+
+
 
 
 

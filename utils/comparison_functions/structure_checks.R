@@ -41,7 +41,7 @@
 #
 # nrow(vars)
 
-structure_content_check_html <- function(df1, df2, name1 = "Dataset 1", name2 = "Dataset 2") {
+structure_content_check_html <- function(df1, df2) {
 
   df1_rows <- nrow(df1)
   df2_rows <- nrow(df2)

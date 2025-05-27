@@ -28,10 +28,48 @@ c1$frame.summary
 
 c1$vars.summary
 
-c2 <- arsenal::comparedf(df1, df2, by = keys)
 
 
-summary(c1)
+vals1 <- df1 %>%
+  select(all_of(c(keys, "AVAL")))
+
+vals2 <- df2 %>%
+  select(all_of(c(keys, "AVAL")))
+
+
+merged <- vals1 %>%
+  full_join(vals2, by = keys) %>%
+  mutate(
+      tol1  = abs(AVAL.x - AVAL.y) > 1e-3,
+      tol2  = abs(AVAL.x - AVAL.y) > 1e-6,
+      tol3  = abs(AVAL.x - AVAL.y) > 1e-9
+  ) %>%
+  filter(tol1 | tol2 | tol3) %>%
+  print()
+
+# c2 <- arsenal::comparedf(df1, df2, by = keys)
+#
+# dif <- summary(c2)$diffs.table
+#
+# test <- dif %>%
+#   filter(var.x == "AVAL") %>%
+#   unnest() %>%
+#   mutate(
+#     AVAL.x = as.numeric(values.x),
+#     AVAL.y = as.numeric(values.y),
+#     tol1  = abs(AVAL.x - AVAL.y) > 1e-3,
+#     tol2  = abs(AVAL.x - AVAL.y) > 1e-6,
+#     tol3  = abs(AVAL.x - AVAL.y) > 1e-10
+#   ) %>%
+#   print()
+
+# tolcheck = abs(AVAL.x - AVAL.y) > tolerance,
+
+
+
+
+
+summary(c2)
 
 
 rounding_check(df1, df2)

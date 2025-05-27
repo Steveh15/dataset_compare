@@ -7,6 +7,7 @@ library(htmlwidgets)
 
 # For testing
 # library(pharmaverseadam)
+library(tidyr)
 
 # library(shinyBS)
 library(DT)
@@ -24,3 +25,6 @@ dev_mode <- TRUE
 source("utils/compare_datasets_function.R")
 source("utils/functions.R")
 source("compare_ui.R")
+
+
+
