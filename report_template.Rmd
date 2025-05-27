@@ -1,8 +1,9 @@
 ---
-title: "ADPP Dataset Comparison Report"
+title: "ADPP/ADPP-like comparison report"
 output: html_document
 params:
   unique_keys: NULL
+  comparison_result: NULL
   row_count_result: NULL
   column_count_result: NULL
   rounding_result: NULL
@@ -19,6 +20,10 @@ library(knitr)
 
 ```
 
+
+
+## Comparison Run Information
+
 ```{r unique_keys}
       report_metadata_ui(
         comparison_date = params$date_time$date,
@@ -29,51 +34,32 @@ library(knitr)
       )
 ```
 
+---
 
-## Number of Rows Check
 
-```{r row_count_check comments}
-row_count_check_markdown(params$row_count_result, params$unique_keys)
+## Structure and Content Checks
 
-if (nzchar(params$comments$row_count)) {
-  comment_text <- paste0("##### Comment\n\n", params$comments$row_count)
+```{r structure_output}
+params$comparison_result$results_structure_ui
+
+if (nzchar(params$comments$structure_and_content)) {
+  comment_text <- paste0("### Structure and Content Checks Comment\n", params$comments$structure_and_content)
   knitr::asis_output(comment_text)
 }
 ```
 
+---
 
-## Number of Columns comparison
+## Row-Level Checks
 
-```{r column_count_check}
-column_count_check_markdown(params$column_count_result)
 
-if (nzchar(params$comments$column_count)) {
-  comment_text <- paste0("##### Comment\n\n", params$comments$column_count)
+```{r row_level_output}
+params$comparison_result$results_row_level_ui
+
+if (nzchar(params$comments$row_level)) {
+  comment_text <- paste0("### Row-Level Checks Comment\n", params$comments$row_level)
   knitr::asis_output(comment_text)
 }
 ```
 
-
-## Decimal Place Check
-
-```{r rounding_check}
-rounding_check_markdown(params$rounding_result)
-
-if (nzchar(params$comments$rounding)) {
-  comment_text <- paste0("##### Comment\n\n", params$comments$rounding)
-  knitr::asis_output(comment_text)
-}
-```
-
-
-## Value Check
-
-```{r value_check}
-value_check_markdown(params$value_result, params$unique_keys)
-
-if (nzchar(params$comments$value)) {
-  comment_text <- paste0("##### Comment\n\n", params$comments$value)
-  knitr::asis_output(comment_text)
-}
-```
-
+---

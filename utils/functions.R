@@ -42,17 +42,26 @@ check_keys <- function(df1, keys = c("USUBJID")) {
 
 
 
-get_decimal_places <- function(x) {
 
-  num_str <- as.character(x)
+# --- NOTE: so as to not pick up floating point errors this function only considers the first 10 decimal places
+get_decimal_places <- function(x, precision = 10) {
+  sapply(x, function(val) {
+    if (is.na(val)) return(NA_integer_)
 
-  sapply(strsplit(num_str, "\\."), function(x){
-    if(length(x) > 1){
-      return(nchar(gsub("0+$", "", x[2])))
-    } else{
-      return(0)
-    }
+    # Round to 10 decimal places
+    val_rounded <- round(val, precision)
+
+    # Convert to character string with fixed 10 dp (no scientific notation)
+    str <- formatC(val_rounded, format = "f", digits = precision)
+
+    # Extract decimal part and trim trailing zeros
+    dec_part <- strsplit(str, "\\.")[[1]][2]
+    dec_trimmed <- sub("0+$", "", dec_part)
+
+    nchar(dec_trimmed)
   })
-
-
 }
+
+
+
+

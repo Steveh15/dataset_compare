@@ -2,6 +2,19 @@
 
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
+
+  observe({
+    if (!dev_mode) {
+      shinyjs::hide("load_test_data_wrapper")
+    } else {
+      shinyjs::show("load_test_data_wrapper")
+    }
+  })
+
+
+
+
+
   # Reactive values to hold the datasets
   dataset1 <- reactive({
     if (input$load_test_data) {
@@ -119,6 +132,7 @@ server <- function(input, output, session) {
 
 
 
+  comparison_data <- reactiveVal(NULL)
 
   comparison_result <- reactiveVal(NULL)
   # comparisonDate <- reactiveVal(NULL)
@@ -132,6 +146,7 @@ server <- function(input, output, session) {
     req(dataset2)
 
 
+
     if (input$unique_keys_check & valid_keys()) {
       selected_keys(input$key_vars)
       compare_list <- compareDatasets(dataset1(), dataset2(), selected_keys())
@@ -141,6 +156,7 @@ server <- function(input, output, session) {
     }
     comparisonDate$date <- Sys.Date()
     comparisonDate$time <- Sys.time()
+    comparison_data(list(dataset1, dataset2))
     comparison_result(compare_list)
   })
 
@@ -192,33 +208,24 @@ server <- function(input, output, session) {
   ##############################################################################
 
   comments <- reactiveValues(
-    row_count = "",
-    column_count = "",
-    rounding = "",
-    value = ""
+    structure_and_content = "",
+    row_level = ""
   )
+
   active_comment_id <- reactiveVal(NULL)
-
   comment_text <- reactiveVal(NULL)
-
-
 
 
 
   output$report_block <- renderUI({
     req(comparison_result())  # only proceeds when comparison_result is not NULL
 
+    tagList(
 
 
-    mainPanel(
+      tags$h1("ADPP/ADPP-like comparison report"),
 
-
-
-      # tagList(if (!is.null(selected_keys())) {
-      #   tagList(tags$h5("Unique Keys"), tags$p(paste(selected_keys(), collapse = ", ")))
-      # })
-
-
+      tags$h2("Comparison Run Information"),
 
       report_metadata_ui(
         comparison_date = comparisonDate$date,
@@ -226,94 +233,63 @@ server <- function(input, output, session) {
         dataset1_name = input$dataset1$name,
         dataset2_name = input$dataset2$name,
         selected_keys = selected_keys()
+      ),
+
+      tags$hr(style = "border-top: 2px solid #888; margin-top: 20px; margin-bottom: 20px;"),
+
+      tags$h2("Structure and Content Checks"),
+
+      # structure_content_check_html(dataset1(), dataset2()),
+      comparison_result()$results_structure_ui,
+
+      tags$h3("Structure and Content Checks Comment", actionButton("structure_and_content_btn", "Edit Comment")),
+      uiOutput("structure_and_content_display"),
+
+      tags$hr(style = "border-top: 2px solid #888; margin-top: 20px; margin-bottom: 20px;"),
+
+      tags$h2("Row-Level Checks"),
+
+    if(is.null(comparison_result()$unique_keys)){
+      tags$p("Unique keys have not been defined. No row-level checks have been performed")
+    } else{
+      tagList(
+        tags$p("Unique keys have been defined"),
+        comparison_result()$results_row_level_ui,
+
+        tags$h3("Row-Level Checks", actionButton("row_level_btn", "Edit Comment")),
+        uiOutput("row_level_display"),
       )
+    },
 
-      ,
-
-      tags$h3(
-        "Number of Rows Comparison",
-        actionButton("row_count_check_comment_btn", "Edit Comment")
-      ),
-      uiOutput("row_count_check_output"),
-      uiOutput("row_count_check_comment_display"),
-
-
-
-      tags$h3(
-        "Number of Columns comparison",
-        actionButton("column_count_check_comment_btn", "Edit Comment")
-      ),
-      uiOutput("column_count_check_output"),
-      uiOutput("column_count_check_comment_display"),
-
-
-      tags$h3(
-        "Decimal Place Check",
-        actionButton("rounding_check_comment_btn", "Edit Comment")
-      ),
-      uiOutput("rounding_check_output"),
-      uiOutput("rounding_check_comment_display"),
-
-
-
-      tags$h3(
-        "Values Check",
-        actionButton("value_check_comment_btn", "Edit Comment")
-      ),
-      uiOutput("value_check_output"),
-      uiOutput("value_check_comment_display")
     )
   })
 
-  output$row_count_check_comment_display <- renderUI({
-    if (nzchar(comments$row_count)) {
-      tags$div(tags$strong("Comment:"), tags$p(comments$row_count))
+  # --- Stucture and Content checks comment ####################################
+
+
+  output$structure_and_content_display <- renderUI({
+    if (nzchar(comments$structure_and_content)) {
+      tags$div(tags$strong("Comment:"), tags$p(comments$structure_and_content))
     }
   })
 
-  output$column_count_check_comment_display <- renderUI({
-    if (nzchar(comments$column_count)) {
-      tags$div(tags$strong("Comment:"),
-               tags$p(comments$column_count))
+  observeEvent(input$structure_and_content_btn, {
+    active_comment_id("structure_and_content")
+    showModal(comment_modal(comments$structure_and_content))
+  })
+
+  output$row_level_display <- renderUI({
+    if (nzchar(comments$row_level)) {
+      tags$div(tags$strong("Comment:"), tags$p(comments$row_level))
     }
   })
 
-  output$rounding_check_comment_display <- renderUI({
-    if (nzchar(comments$rounding)) {
-      tags$div(tags$strong("Comment:"), tags$p(comments$rounding))
-    }
+  observeEvent(input$row_level_btn, {
+    active_comment_id("row_level")
+    showModal(comment_modal(comments$row_level))
   })
 
-  output$value_check_comment_display <- renderUI({
-    if (nzchar(comments$value)) {
-      tags$div(tags$strong("Comment:"), tags$p(comments$value))
-    }
-  })
-
-
-
-
-  observeEvent(input$row_count_check_comment_btn, {
-    active_comment_id("row_count")
-    showModal(comment_modal(comments$row_count))
-  })
-
-  observeEvent(input$column_count_check_comment_btn, {
-    active_comment_id("column_count")
-    showModal(comment_modal(comments$column_count))
-  })
-
-  observeEvent(input$rounding_check_comment_btn, {
-    active_comment_id("rounding")
-    showModal(comment_modal(comments$rounding))
-  })
-
-  observeEvent(input$value_check_comment_btn, {
-    active_comment_id("value")
-    showModal(comment_modal(comments$value))
-  })
-
-
+  ##############################################################################
 
   comment_modal <- function(current_value) {
     modalDialog(
@@ -354,8 +330,11 @@ server <- function(input, output, session) {
 
   output$download_report <- downloadHandler(
     filename = function() {
-      "comparison_report.html"
-      # paste0("adpp_comparison_report_",format(Sys.Date(), "%Y_%m_%d"),"T",format(Sys.time(), "%H_%M"),".html")
+      if(dev_mode){
+        "comparison_report.html"
+      } else{
+        paste0("adpp_comparison_report_",format(Sys.Date(), "%Y_%m_%d"),"T",format(Sys.time(), "%H_%M"),".html")
+      }
     },
     content = function(file) {
       # Save to a temporary file first
@@ -366,10 +345,7 @@ server <- function(input, output, session) {
         output_file = temp_report,
         params = list(
           unique_keys = selected_keys(),
-          row_count_result = comparison_result()$row_count_check,
-          column_count_result = comparison_result()$column_count_check,
-          rounding_result = comparison_result()$rounding_check,
-          value_result = comparison_result()$value_check,
+          comparison_result = comparison_result(),
           comments = reactiveValuesToList(comments),
           date_time = reactiveValuesToList(comparisonDate),
           datasets = list(dataset1_name = input$dataset1$name, dataset2_name = input$dataset2$name)
