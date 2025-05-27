@@ -36,11 +36,10 @@ library(knitr)
 
 ---
 
-<!-- New structure Check Section -->
 
 ## Structure and Content Checks
 
-```{r comparison_result}
+```{r structure_output}
 params$comparison_result$results_structure_ui
 
 if (nzchar(params$comments$structure_and_content)) {
@@ -51,52 +50,16 @@ if (nzchar(params$comments$structure_and_content)) {
 
 ---
 
-# OLD
-
-<!-- ## Number of Rows Check -->
-
-<!-- ```{r row_count_check comments} -->
-<!-- row_count_check_markdown(params$row_count_result, params$unique_keys) -->
-
-<!-- if (nzchar(params$comments$row_count)) { -->
-<!--   comment_text <- paste0("##### Comment\n\n", params$comments$row_count) -->
-<!--   knitr::asis_output(comment_text) -->
-<!-- } -->
-<!-- ``` -->
+## Row-Level Checks
 
 
-<!-- ## Number of Columns comparison -->
+```{r row_level_output}
+params$comparison_result$results_row_level_ui
 
-<!-- ```{r column_count_check} -->
-<!-- column_count_check_markdown(params$column_count_result) -->
-
-<!-- if (nzchar(params$comments$column_count)) { -->
-<!--   comment_text <- paste0("##### Comment\n\n", params$comments$column_count) -->
-<!--   knitr::asis_output(comment_text) -->
-<!-- } -->
-<!-- ``` -->
-
-
-## Decimal Place Check
-
-```{r rounding_check}
-rounding_check_markdown(params$rounding_result)
-
-if (nzchar(params$comments$rounding)) {
-  comment_text <- paste0("##### Comment\n\n", params$comments$rounding)
+if (nzchar(params$comments$row_level)) {
+  comment_text <- paste0("### Row-Level Checks Comment\n", params$comments$row_level)
   knitr::asis_output(comment_text)
 }
 ```
 
-
-## Value Check
-
-```{r value_check}
-value_check_markdown(params$value_result, params$unique_keys)
-
-if (nzchar(params$comments$value)) {
-  comment_text <- paste0("##### Comment\n\n", params$comments$value)
-  knitr::asis_output(comment_text)
-}
-```
-
+---

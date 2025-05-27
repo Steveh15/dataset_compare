@@ -1,45 +1,30 @@
 
 
+rounding_check <- function(df1, df2, precision = 10) {
 
-#
-# c1 <- arsenal::comparedf(df1, df2)
-#
-# # c1 <- arsenal::comparedf(test1_1, test1_2)
-#
-#
-# sum <- summary(c1)
-#
-# sum$frame.summary.table
-#
-# sum$comparison.summary.table
-#
-# vars <- sum$vars.ns.table
-#
-# types <- sum$vars.nc.table
-#
-#
-#
-# types %>% select(var.x, class.x, class.y)
-#
-#
-# types[, c("var.x", "class.x", "class.y")]
-#
-# vars %>% filter(version == "x")
-#
-# vars[vars$version == "x",]
-#
-# paste0(vars[vars$version == "x",]$variable, collapse = ", ")
-# paste0(vars[vars$version == "y",]$variable, collapse = ", ")
-#
-# vars[vars$version == "x",]
-#
-# sum$frame.summary.table
-#
-#
-# vars <- sum$vars.ns.table
-# vars
-#
-# nrow(vars)
+  dp_list <- list(df1, df2) %>% lapply(function(x)
+    x %>%
+      rowwise() %>%
+      mutate(
+        dp = get_decimal_places(AVAL, precision = precision)
+      ) %>%
+      group_by(PARAMCD) %>%
+      summarise(
+        dp = max(dp, na.rm = TRUE)
+      )
+  )
+
+  dp_compare <- merge(dp_list[[1]], dp_list[[2]], by = "PARAMCD", all = TRUE) %>%
+    filter(dp.x != dp.y)
+
+  names(dp_compare) <-c("PARAMCD", "ADPP", "ADPP-like")
+
+  return(dp_compare)
+
+}
+
+
+
 
 structure_content_check_html <- function(df1, df2) {
 
@@ -55,7 +40,7 @@ structure_content_check_html <- function(df1, df2) {
   names(col_type_differences) <- c("Variable", "ADPP", "ADPP-like")
 
 
-  rounding_differences <- rounding_check_new(df1,df2, precision = 10)
+  rounding_differences <- rounding_check(df1,df2, precision = 10)
 
   html_output <- tagList(
 
@@ -130,8 +115,6 @@ structure_content_check_html <- function(df1, df2) {
 
 
   )
-
-
 
 
   return(html_output)

@@ -13,14 +13,7 @@ df2 <- df1_1[  -sample(1:nrow(df1_1), 25), ] %>%
   select(-c(DTHFL, DTHDTC)) %>%
   mutate(
     AGE = as.character(AGE),
-    # AVAL = round(AVAL, 3),
-
-    AVAL = case_when(
-      PPTESTCD == "AUCALL" ~ round(AVAL, 3),
-      PPTESTCD == "CLST" ~ round(AVAL, 4),
-      .default = AVAL
-    )
-
+    # AVAL = round(AVAL, 3)
   )
 
 
@@ -59,6 +52,16 @@ df2$edit[samps] <- 1
 # df2$AVAL[samp2] <- NA
 
 
+
+df2 <- df2 %>%
+ mutate(
+    AVAL = case_when(
+      PPTESTCD == "AUCALL" ~ round(AVAL, 3),
+      PPTESTCD == "CLST" ~ round(AVAL, 4),
+      PPTESTCD == "LAMZNPT" ~ round(AVAL, 0),
+      .default = AVAL
+    )
+  )
 
 
 df1 <- df1_1[-sample(1:nrow(df1_1), 15), ] %>%

@@ -25,16 +25,6 @@ compareDatasets <- function(df1, df2, unique_keys = NULL) {
   }
 
 
-
-
-
-
-  results$row_count_check <- row_count_check(df1, df2, unique_keys)
-  results$column_count_check <- column_count_check(df1, df2, unique_keys)
-  results$rounding_check <- rounding_check(df1, df2)
-  results$value_check <- value_check(df1, df2, unique_keys)
-
-
   return(results)
 }
 
