@@ -50,9 +50,10 @@ structure_content_check_html <- function(df1, df2) {
       tags$p(paste("ADPP has", df1_rows, "rows.")),
       tags$p(paste("ADPP-like has", df2_rows, "rows.")),
       if(row_diff > 0){
-        tags$p(style = "font-weight: bold; color: red;",paste("Difference in number of rows:", row_diff))
+        tags$p(style = "font-weight: bold;",paste("Difference in number of rows:", row_diff))
       } else{
-        tags$p(style = "font-weight: bold; color: green;",paste("Difference in number of rows:", row_diff))
+        tags$p(style = "font-weight: bold;",paste("Difference in number of rows:", row_diff))
+        # color: red;
       }
 
     ),

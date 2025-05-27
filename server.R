@@ -236,6 +236,7 @@ server <- function(input, output, session) {
       ),
 
       tags$hr(style = "border-top: 2px solid #888; margin-top: 20px; margin-bottom: 20px;"),
+      # --- ######################################################################
 
       tags$h2("Structure and Content Checks"),
 
@@ -246,6 +247,7 @@ server <- function(input, output, session) {
       uiOutput("structure_and_content_display"),
 
       tags$hr(style = "border-top: 2px solid #888; margin-top: 20px; margin-bottom: 20px;"),
+      # --- ######################################################################
 
       tags$h2("Row-Level Checks"),
 
@@ -256,11 +258,13 @@ server <- function(input, output, session) {
         tags$p("Unique keys have been defined"),
         comparison_result()$results_row_level_ui,
 
-        tags$h3("Row-Level Checks", actionButton("row_level_btn", "Edit Comment")),
+        tags$h3("Row-Level Checks Comment", actionButton("row_level_btn", "Edit Comment")),
         uiOutput("row_level_display"),
       )
     },
 
+    tags$hr(style = "border-top: 2px solid #888; margin-top: 20px; margin-bottom: 20px;"),
+    # --- ######################################################################
     )
   })
 

@@ -21,24 +21,27 @@ row_level_checks_html <- function(df1, df2, unique_keys = NULL){
     ) %>%
     mutate(
 
-      tol1  = abs(values.x - values.y) >= 1e-3,
-      tol2  = abs(values.x - values.y) >= 1e-6,
-      tol3  = abs(values.x - values.y) >= 1e-9,
+      diff = abs(values.x - values.y),
+      tol1 = diff >= 1e-3,
+      tol2 = diff >= 1e-6,
+      tol3 = diff >= 1e-9,
+      tol4 = diff < 1e-9,
 
       tol_na =  (is.na(values.x) & !is.na(values.y) ) | (!is.na(values.x) & is.na(values.y) ),
 
-      tol0 = any(c(tol_na, tol1, tol2, tol3), na.rm = TRUE),
+      tol0 = any(c(tol_na, tol1, tol2, tol3, tol4), na.rm = TRUE),
 
       tol = case_when(
         tol_na ~ "Missing",
         tol1 ~ ">= 1e-3",
         !tol1 & tol2  ~ ">= 1e-6",
-        !tol2 & tol3 ~ ">= 1e-9"
+        !tol2 & tol3 ~ ">= 1e-9",
+        !tol3 & tol4 ~ "< 1e-9",
 
       )
 
     ) %>%
-    filter(tol1 | tol2 | tol3 | tol_na)
+    filter(tol1 | tol2 | tol3 | tol4 | tol_na)
 
   aval_summary <- aval_diffs %>%
     summarise(
@@ -46,6 +49,7 @@ row_level_checks_html <- function(df1, df2, unique_keys = NULL){
       tol1_sum = sum(tol1, na.rm = TRUE),
       tol2_sum = sum(tol2 & !tol1, na.rm = TRUE),
       tol3_sum = sum(tol3 & !tol2, na.rm = TRUE),
+      tol4_sum = sum(tol4 & !tol3, na.rm = TRUE),
       tolna_sum = sum(tol_na, na.rm = TRUE)
     ) %>%
     pivot_longer(cols = everything()) %>%
@@ -56,6 +60,7 @@ row_level_checks_html <- function(df1, df2, unique_keys = NULL){
         "tol1_sum"   ~ "∆ ≥ 1e-3",
         "tol2_sum"   ~ "1e-3 > ∆ ≥ 1e-6",
         "tol3_sum"   ~ "1e-6 > ∆ ≥ 1e-9",
+        "tol4_sum"   ~ "∆ < 1e-9",
         "tolna_sum"  ~ "AVAL missing in one dataset"
       ),
       value = as.character(value)
