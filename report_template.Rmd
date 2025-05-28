@@ -58,7 +58,7 @@ params$comparison_result$results_row_level_ui
 
 ```
 
-```{r another_block, results='asis'}
+```{r tabset_header, results='asis'}
 if(!is.null(params$unique_keys)){
   knitr::asis_output("### All Other Variables Comparison {.tabset}")
 }
@@ -68,9 +68,7 @@ if(!is.null(params$unique_keys)){
 ```{r all_diffs, results='asis'}
 
 if(!is.null(params$unique_keys)){
-  # knitr::asis_output("### All Other Variables Comparison {.tabset}")
-  # knitr::asis_output("#### All Differences")
-  cat("#### All Differences")
+  knitr::asis_output("#### All Differences")
   DT::datatable(
   params$other_diffs,
   class = "display",
@@ -78,16 +76,13 @@ if(!is.null(params$unique_keys)){
   # width = 500,
   colnames = c(params$unique_keys, "Variable name", "ADPP", "ADPP-like")
   )
-  
-  
 }
 
 ```
 
-
 ```{r unique_diffs, results='asis'}
 if(!is.null(params$unique_keys)){
-  cat("#### Unique Differences")
+  knitr::asis_output("#### Unique Differences")
   DT::datatable(
     params$other_diffs_unique,
     class = "display",
