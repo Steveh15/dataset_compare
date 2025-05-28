@@ -2,6 +2,10 @@
 unique_keys <- c("USUBJID", "ID")
 
 
+test <- compareDatasets(df1, df2, unique_keys = c("USUBJID", "ID"))
+
+
+
 comp <- summary(arsenal::comparedf(df1, df2, by = unique_keys))
 
 # --- Mismatched rows check

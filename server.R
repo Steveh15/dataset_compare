@@ -252,7 +252,7 @@ server <- function(input, output, session) {
       tags$h2("Row-Level Checks"),
 
     if(is.null(comparison_result()$unique_keys)){
-      tags$p("Unique keys have not been defined. No row-level checks have been performed")
+      comparison_result()$results_row_level_ui
     } else{
       tagList(
         tags$p("Unique keys have been defined"),
@@ -272,7 +272,7 @@ server <- function(input, output, session) {
                        class = "display",
                        rownames = FALSE,
                        width = 500,
-                       colnames = c(unique_keys, "Variable name", "ADPP", "ADPP-like")
+                       colnames = c(selected_keys(), "Variable name", "ADPP", "ADPP-like")
                      )),
             tabPanel("Distinct Difference Only",
                      DT::datatable(
@@ -289,6 +289,8 @@ server <- function(input, output, session) {
         tags$h3("Row-Level Checks Comment", actionButton("row_level_btn", "Edit Comment")),
         uiOutput("row_level_display"),
       )
+
+
     },
 
     tags$hr(style = "border-top: 2px solid #888; margin-top: 20px; margin-bottom: 20px;"),

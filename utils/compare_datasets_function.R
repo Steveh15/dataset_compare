@@ -38,9 +38,11 @@ compareDatasets <- function(df1, df2, unique_keys = NULL) {
 
 
   } else{
-    results$results_row_level_ui <- NULL
+
+    results$results_row_level_ui <- tags$p("Unique keys have not been defined. No row-level checks have been performed.")
     results$other_diffs <- NULL
     results$other_diffs_unique <- NULL
+
   }
 
 

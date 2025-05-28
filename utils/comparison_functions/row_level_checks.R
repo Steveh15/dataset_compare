@@ -72,7 +72,7 @@ row_level_checks_html <- function(df1, df2, unique_keys = NULL){
   names(aval_summary_bold) <- c("Difference detected", "n")
 
   aval_diff_table <- aval_diffs %>%
-    select(unique_keys, values.x, values.y, tol) %>%
+    select(all_of(unique_keys), values.x, values.y, tol) %>%
     mutate(
       values.x = format(values.x, digits = 9, nsmall = 3) %>% trimws(),
       values.y = format(values.y, digits = 9, nsmall = 3) %>% trimws(),
