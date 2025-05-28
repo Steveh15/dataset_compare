@@ -11,6 +11,8 @@ params:
   comments: NULL
   date_time: NULL
   datasets: NULL
+  other_diffs: NULL
+  other_diffs_unique: NULL
 ---
 
 ```{r setup, include=FALSE}
@@ -56,10 +58,62 @@ if (nzchar(params$comments$structure_and_content)) {
 ```{r row_level_output}
 params$comparison_result$results_row_level_ui
 
+
+
+
 if (nzchar(params$comments$row_level)) {
   comment_text <- paste0("### Row-Level Checks Comment\n", params$comments$row_level)
   knitr::asis_output(comment_text)
 }
 ```
+
+
+
+
+<!-- ### Tables {.tabset} -->
+
+<!-- ### All Differences -->
+
+<!-- ```{r other_diffs} -->
+
+<!-- DT::datatable(params$other_diffs) -->
+<!-- ``` -->
+
+<!-- ### Unique Differences -->
+
+<!-- ```{r other_diffs_unique} -->
+<!-- DT::datatable(params$other_diffs_unique) -->
+<!-- ``` -->
+
+
+`r` if (!is.null(params$other_diffs)) { `/r`
+
+## Tables {.tabset}
+
+### All Differences
+
+```{r all_diffs}
+DT::datatable(
+  params$other_diffs,
+  class = "display",
+  rownames = FALSE,
+  # width = 500,
+  colnames = c(params$unique_keys, "Variable name", "ADPP", "ADPP-like")
+  )
+```
+
+### Unique Differences
+
+```{r unique_diffs}
+DT::datatable(
+  params$other_diffs_unique,
+  class = "display",
+  rownames = FALSE,
+  # width = 500,
+  colnames = c("Variable name", "ADPP", "ADPP-like")
+  )
+```
+
+`r` } `/r`
 
 ---

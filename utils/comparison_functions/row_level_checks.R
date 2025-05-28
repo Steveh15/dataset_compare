@@ -80,6 +80,19 @@ row_level_checks_html <- function(df1, df2, unique_keys = NULL){
     )
 
 
+  # --- other differences check
+  # other_diffs <- comp$diffs.table %>%
+  #   filter(var.x != "AVAL") %>%
+  #   mutate(
+  #     across( c("values.x", "values.y"),~ if_else(is.na(.), NA, as.character(.)))
+  #   ) %>%
+  #   # as_tibble() %>%
+  #   select(all_of(unique_keys), var.x, values.x, values.y)
+  #
+  # other_diffs_unique <- other_diffs %>%
+  #   distinct(var.x, values.x, values.y)
+
+
   # --- HTML output
 
   html_output <- tagList(
@@ -130,6 +143,29 @@ row_level_checks_html <- function(df1, df2, unique_keys = NULL){
 
       )
     },
+
+    # tags$h2("All Other Variables Comparison"),
+    #
+    # tabsetPanel(
+    #   tabPanel("All Differences",
+    #            DT::datatable(
+    #              other_diffs,
+    #              options = list(pageLength = 5),
+    #              class = "display",
+    #              rownames = FALSE,
+    #              width = 500,
+    #              colnames = c(unique_keys, "Variable name", "ADPP", "ADPP-like")
+    #            )),
+    #   tabPanel("Distinct Difference Only",
+    #            DT::datatable(
+    #              other_diffs_unique,
+    #              options = list(pageLength = 5),
+    #              class = "display",
+    #              rownames = FALSE,
+    #              width = 500,
+    #              colnames = c("Variable name", "ADPP", "ADPP-like")
+    #            ))
+    # )
 
 
   )

@@ -258,6 +258,34 @@ server <- function(input, output, session) {
         tags$p("Unique keys have been defined"),
         comparison_result()$results_row_level_ui,
 
+
+        tags$h2("All Other Variables Comparison"),
+
+        if(nrow(comparison_result()$other_diffs) == 0){
+          tags$p("No differences were detected in AVAL between ADPP or ADPP-like.")
+        } else{
+          tabsetPanel(
+            tabPanel("All Differences",
+                     DT::datatable(
+                       comparison_result()$other_diffs,
+                       options = list(pageLength = 5),
+                       class = "display",
+                       rownames = FALSE,
+                       width = 500,
+                       colnames = c(unique_keys, "Variable name", "ADPP", "ADPP-like")
+                     )),
+            tabPanel("Distinct Difference Only",
+                     DT::datatable(
+                       comparison_result()$other_diffs_unique,
+                       options = list(pageLength = 5),
+                       class = "display",
+                       rownames = FALSE,
+                       width = 500,
+                       colnames = c("Variable name", "ADPP", "ADPP-like")
+                     ))
+          )
+        },
+
         tags$h3("Row-Level Checks Comment", actionButton("row_level_btn", "Edit Comment")),
         uiOutput("row_level_display"),
       )
@@ -352,8 +380,9 @@ server <- function(input, output, session) {
           comparison_result = comparison_result(),
           comments = reactiveValuesToList(comments),
           date_time = reactiveValuesToList(comparisonDate),
-          datasets = list(dataset1_name = input$dataset1$name, dataset2_name = input$dataset2$name)
-
+          datasets = list(dataset1_name = input$dataset1$name, dataset2_name = input$dataset2$name),
+          other_diffs = comparison_result()$other_diffs,
+          other_diffs_unique = comparison_result()$other_diffs_unique
         ),
         envir = new.env(parent = globalenv())  # Prevents polluting global env
       )
