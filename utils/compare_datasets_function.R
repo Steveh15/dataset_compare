@@ -20,29 +20,8 @@ compareDatasets <- function(df1, df2, unique_keys = NULL) {
 
   if(!is.null(unique_keys)){
     results$results_row_level_ui <- row_level_checks_html(df1, df2, unique_keys = unique_keys)
-
-
-
-    comp <- summary(arsenal::comparedf(df1, df2, by = unique_keys))
-
-    results$other_diffs <- comp$diffs.table %>%
-      filter(var.x != "AVAL") %>%
-      mutate(
-        across( c("values.x", "values.y"),~ if_else(is.na(.), NA, as.character(.)))
-      ) %>%
-
-      select(all_of(unique_keys), var.x, values.x, values.y)
-
-    results$other_diffs_unique <- results$other_diffs %>%
-      distinct(var.x, values.x, values.y)
-
-
   } else{
-
-    results$results_row_level_ui <- tags$p("Unique keys have not been defined. No row-level checks have been performed.")
-    results$other_diffs <- NULL
-    results$other_diffs_unique <- NULL
-
+    results$results_row_level_ui <- NULL
   }
 
 

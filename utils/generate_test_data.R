@@ -8,21 +8,12 @@ df1_1 <- pharmaverseadam::adpp %>%
   mutate(ID = row_number()) %>%
   select(USUBJID, ID, everything())
 
-propcase <- function(x) {
-  sapply(strsplit(tolower(x), " "), function(words) {
-    paste(toupper(substring(words, 1, 1)), substring(words, 2), sep = "", collapse = " ")
-  })
-}
 
 df2 <- df1_1[  -sample(1:nrow(df1_1), 25), ] %>%
   select(-c(DTHFL, DTHDTC)) %>%
   mutate(
     AGE = as.character(AGE),
-    # AVAL = round(AVAL, 3),
-
-    RACE = propcase(RACE),
-    TRTP = toupper(TRTP),
-    TRTA = toupper(TRTA)
+    # AVAL = round(AVAL, 3)
   )
 
 
@@ -39,10 +30,6 @@ df2$AVAL[samp2] <- NA
 df2$AVAL[samp3] <- round(df2$AVAL[samp3],3)
 df2$edit <- NA
 df2$edit[samps] <- 1
-
-
-
-
 
 # samp1 <-
 #

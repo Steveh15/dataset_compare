@@ -1,6 +1,4 @@
 
-rm(list = ls())
-
 library(shiny)
 library(dplyr)
 library(stringr)

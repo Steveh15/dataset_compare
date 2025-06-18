@@ -21,27 +21,24 @@ row_level_checks_html <- function(df1, df2, unique_keys = NULL){
     ) %>%
     mutate(
 
-      diff = abs(values.x - values.y),
-      tol1 = diff >= 1e-3,
-      tol2 = diff >= 1e-6,
-      tol3 = diff >= 1e-9,
-      tol4 = diff < 1e-9,
+      tol1  = abs(values.x - values.y) >= 1e-3,
+      tol2  = abs(values.x - values.y) >= 1e-6,
+      tol3  = abs(values.x - values.y) >= 1e-9,
 
       tol_na =  (is.na(values.x) & !is.na(values.y) ) | (!is.na(values.x) & is.na(values.y) ),
 
-      tol0 = any(c(tol_na, tol1, tol2, tol3, tol4), na.rm = TRUE),
+      tol0 = any(c(tol_na, tol1, tol2, tol3), na.rm = TRUE),
 
       tol = case_when(
         tol_na ~ "Missing",
         tol1 ~ ">= 1e-3",
         !tol1 & tol2  ~ ">= 1e-6",
-        !tol2 & tol3 ~ ">= 1e-9",
-        !tol3 & tol4 ~ "< 1e-9",
+        !tol2 & tol3 ~ ">= 1e-9"
 
       )
 
     ) %>%
-    filter(tol1 | tol2 | tol3 | tol4 | tol_na)
+    filter(tol1 | tol2 | tol3 | tol_na)
 
   aval_summary <- aval_diffs %>%
     summarise(
@@ -49,7 +46,6 @@ row_level_checks_html <- function(df1, df2, unique_keys = NULL){
       tol1_sum = sum(tol1, na.rm = TRUE),
       tol2_sum = sum(tol2 & !tol1, na.rm = TRUE),
       tol3_sum = sum(tol3 & !tol2, na.rm = TRUE),
-      tol4_sum = sum(tol4 & !tol3, na.rm = TRUE),
       tolna_sum = sum(tol_na, na.rm = TRUE)
     ) %>%
     pivot_longer(cols = everything()) %>%
@@ -60,7 +56,6 @@ row_level_checks_html <- function(df1, df2, unique_keys = NULL){
         "tol1_sum"   ~ "∆ ≥ 1e-3",
         "tol2_sum"   ~ "1e-3 > ∆ ≥ 1e-6",
         "tol3_sum"   ~ "1e-6 > ∆ ≥ 1e-9",
-        "tol4_sum"   ~ "∆ < 1e-9",
         "tolna_sum"  ~ "AVAL missing in one dataset"
       ),
       value = as.character(value)
@@ -72,25 +67,12 @@ row_level_checks_html <- function(df1, df2, unique_keys = NULL){
   names(aval_summary_bold) <- c("Difference detected", "n")
 
   aval_diff_table <- aval_diffs %>%
-    select(all_of(unique_keys), values.x, values.y, tol) %>%
+    select(unique_keys, values.x, values.y, tol) %>%
     mutate(
       values.x = format(values.x, digits = 9, nsmall = 3) %>% trimws(),
       values.y = format(values.y, digits = 9, nsmall = 3) %>% trimws(),
       across(c("values.x", "values.y"), ~if_else(. == "NA", ".", .))
     )
-
-
-  # --- other differences check
-  # other_diffs <- comp$diffs.table %>%
-  #   filter(var.x != "AVAL") %>%
-  #   mutate(
-  #     across( c("values.x", "values.y"),~ if_else(is.na(.), NA, as.character(.)))
-  #   ) %>%
-  #   # as_tibble() %>%
-  #   select(all_of(unique_keys), var.x, values.x, values.y)
-  #
-  # other_diffs_unique <- other_diffs %>%
-  #   distinct(var.x, values.x, values.y)
 
 
   # --- HTML output
@@ -143,29 +125,6 @@ row_level_checks_html <- function(df1, df2, unique_keys = NULL){
 
       )
     },
-
-    # tags$h2("All Other Variables Comparison"),
-    #
-    # tabsetPanel(
-    #   tabPanel("All Differences",
-    #            DT::datatable(
-    #              other_diffs,
-    #              options = list(pageLength = 5),
-    #              class = "display",
-    #              rownames = FALSE,
-    #              width = 500,
-    #              colnames = c(unique_keys, "Variable name", "ADPP", "ADPP-like")
-    #            )),
-    #   tabPanel("Distinct Difference Only",
-    #            DT::datatable(
-    #              other_diffs_unique,
-    #              options = list(pageLength = 5),
-    #              class = "display",
-    #              rownames = FALSE,
-    #              width = 500,
-    #              colnames = c("Variable name", "ADPP", "ADPP-like")
-    #            ))
-    # )
 
 
   )

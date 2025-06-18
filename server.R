@@ -236,7 +236,6 @@ server <- function(input, output, session) {
       ),
 
       tags$hr(style = "border-top: 2px solid #888; margin-top: 20px; margin-bottom: 20px;"),
-      # --- ######################################################################
 
       tags$h2("Structure and Content Checks"),
 
@@ -247,54 +246,21 @@ server <- function(input, output, session) {
       uiOutput("structure_and_content_display"),
 
       tags$hr(style = "border-top: 2px solid #888; margin-top: 20px; margin-bottom: 20px;"),
-      # --- ######################################################################
 
       tags$h2("Row-Level Checks"),
 
     if(is.null(comparison_result()$unique_keys)){
-      comparison_result()$results_row_level_ui
+      tags$p("Unique keys have not been defined. No row-level checks have been performed")
     } else{
       tagList(
         tags$p("Unique keys have been defined"),
         comparison_result()$results_row_level_ui,
 
-
-        tags$h2("All Other Variables Comparison"),
-
-        if(nrow(comparison_result()$other_diffs) == 0){
-          tags$p("No differences were detected in AVAL between ADPP or ADPP-like.")
-        } else{
-          tabsetPanel(
-            tabPanel("All Differences",
-                     DT::datatable(
-                       comparison_result()$other_diffs,
-                       options = list(pageLength = 5),
-                       class = "display",
-                       rownames = FALSE,
-                       width = 500,
-                       colnames = c(selected_keys(), "Variable name", "ADPP", "ADPP-like")
-                     )),
-            tabPanel("Distinct Difference Only",
-                     DT::datatable(
-                       comparison_result()$other_diffs_unique,
-                       options = list(pageLength = 5),
-                       class = "display",
-                       rownames = FALSE,
-                       width = 500,
-                       colnames = c("Variable name", "ADPP", "ADPP-like")
-                     ))
-          )
-        },
-
-        tags$h3("Row-Level Checks Comment", actionButton("row_level_btn", "Edit Comment")),
+        tags$h3("Row-Level Checks", actionButton("row_level_btn", "Edit Comment")),
         uiOutput("row_level_display"),
       )
-
-
     },
 
-    tags$hr(style = "border-top: 2px solid #888; margin-top: 20px; margin-bottom: 20px;"),
-    # --- ######################################################################
     )
   })
 
@@ -382,9 +348,8 @@ server <- function(input, output, session) {
           comparison_result = comparison_result(),
           comments = reactiveValuesToList(comments),
           date_time = reactiveValuesToList(comparisonDate),
-          datasets = list(dataset1_name = input$dataset1$name, dataset2_name = input$dataset2$name),
-          other_diffs = comparison_result()$other_diffs,
-          other_diffs_unique = comparison_result()$other_diffs_unique
+          datasets = list(dataset1_name = input$dataset1$name, dataset2_name = input$dataset2$name)
+
         ),
         envir = new.env(parent = globalenv())  # Prevents polluting global env
       )
