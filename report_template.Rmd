@@ -68,7 +68,7 @@ if(!is.null(params$unique_keys)){
 ```{r all_diffs, results='asis'}
 
 if(!is.null(params$unique_keys)){
-  knitr::asis_output("#### All Differences")
+  cat("#### All Differences")
   DT::datatable(
   params$other_diffs,
   class = "display",
@@ -82,7 +82,7 @@ if(!is.null(params$unique_keys)){
 
 ```{r unique_diffs, results='asis'}
 if(!is.null(params$unique_keys)){
-  knitr::asis_output("#### Unique Differences")
+  cat("#### Unique Differences")
   DT::datatable(
     params$other_diffs_unique,
     class = "display",

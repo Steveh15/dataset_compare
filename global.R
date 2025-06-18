@@ -18,8 +18,6 @@ library(htmlTable)
 
 source("utils/generate_test_data.R")
 
-dev_mode <- TRUE
-
 
 # df1 <- haven::read_xpt(file.path("data", "df1.xpt"))
 # df2 <- haven::read_xpt(file.path("data", "df2.xpt"))

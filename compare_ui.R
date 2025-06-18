@@ -2,12 +2,6 @@
 
 
 sidebar_content <- tagList(
-
-  # checkboxInput("load_test_data", "Load test data", value = FALSE),
-
-    div(id = "load_test_data_wrapper",
-        checkboxInput("load_test_data", "Load test data", value = FALSE)
-    ),
   fileInput("dataset1", "Upload ADPP (.xpt):", accept = c(".xpt")),
   fileInput("dataset2", "Upload ADPP-like (.xpt):", accept = c(".xpt")),
   checkboxInput("unique_keys_check", "Define unique keys for row-level checks?", value = FALSE),
