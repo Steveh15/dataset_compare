@@ -3,6 +3,10 @@
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
 
+  # --- Dataset Input
+  #
+  ##############################################################################
+
   observe({
     if (!dev_mode) {
       shinyjs::hide("load_test_data_wrapper")
@@ -10,9 +14,6 @@ server <- function(input, output, session) {
       shinyjs::show("load_test_data_wrapper")
     }
   })
-
-
-
 
 
   # Reactive values to hold the datasets
@@ -39,19 +40,11 @@ server <- function(input, output, session) {
   })
 
 
-  output$compare_btn_ui <- renderUI({
-    # Disable if datasets don't exist, or if unique keys have been requested but the keys aren't valid
-    if (is.null(dataset1()) ||
-        is.null(dataset2()) ||
-        (input$unique_keys_check & !valid_keys())) {
-      actionButton("compare_btn", "Compare Datasets", disabled = TRUE)
-    } else {
-      # Both datasets are present, enable the button
-      actionButton("compare_btn", "Compare Datasets")
-    }
+  # --- Unique Keys Definition
+  #
+  ##############################################################################
 
-
-  })
+  selected_keys <- reactiveVal(NULL)
 
 
   # Find common variables between the two datasets
@@ -59,10 +52,6 @@ server <- function(input, output, session) {
     req(dataset1(), dataset2())
     intersect(colnames(dataset1()), colnames(dataset2()))
   })
-
-
-  selected_keys <- reactiveVal(NULL)
-
 
   # Dynamically render dropdown menus for selecting keys
   output$key_selector_ui <- renderUI({
@@ -123,7 +112,6 @@ server <- function(input, output, session) {
       }
 
     }
-
     return(msg)
   })
 
@@ -131,31 +119,62 @@ server <- function(input, output, session) {
 
 
 
+  # --- Perform Comparison
+  #
+  ##############################################################################
 
   comparison_data <- reactiveVal(NULL)
-
   comparison_result <- reactiveVal(NULL)
-  # comparisonDate <- reactiveVal(NULL)
-  comparisonDate <- reactiveValues(
-    date = "",
-    time = ""
-  )
+
+  # comparisonDate <- reactiveValues(
+  #   date = "",
+  #   time = ""
+  # )
+
+  output$compare_btn_ui <- renderUI({
+    # Disable if datasets don't exist, or if unique keys have been requested but the keys aren't valid
+    if (is.null(dataset1()) ||
+        is.null(dataset2()) ||
+        (input$unique_keys_check & !valid_keys())) {
+      actionButton("compare_btn", "Compare Datasets", disabled = TRUE)
+    } else {
+      # Both datasets are present, enable the button
+      actionButton("compare_btn", "Compare Datasets")
+    }
+  })
+
 
   observeEvent(input$compare_btn, {
     req(dataset1)
     req(dataset2)
 
-
+    metadata_list <- list(
+      path1 = "path1",
+      path2 = "path2",
+      name1 = "name1.xpt",
+      name2 = "name2.xpt",
+      datetime = Sys.time()
+      )
 
     if (input$unique_keys_check & valid_keys()) {
       selected_keys(input$key_vars)
-      compare_list <- compareDatasets(dataset1(), dataset2(), selected_keys())
+      compare_list <- compareDatasets(
+        df1 = dataset1(),
+        df2 = dataset2(),
+        unique_keys = selected_keys(),
+        metadata = metadata_list
+        )
     } else{
       selected_keys(NULL)
-      compare_list <- compareDatasets(dataset1(), dataset2())
+      compare_list <- compareDatasets(
+        df1 = dataset1(),
+        df2 = dataset2(),
+        unique_keys = NULL,
+        metadata = metadata_list
+      )
     }
-    comparisonDate$date <- Sys.Date()
-    comparisonDate$time <- Sys.time()
+    # comparisonDate$date <- Sys.Date()
+    # comparisonDate$time <- Sys.time()
     comparison_data(list(dataset1, dataset2))
     comparison_result(compare_list)
   })
@@ -228,19 +247,18 @@ server <- function(input, output, session) {
       tags$h2("Comparison Run Information"),
 
       report_metadata_ui(
-        comparison_date = comparisonDate$date,
-        comparison_time = comparisonDate$time,
-        dataset1_name = input$dataset1$name,
-        dataset2_name = input$dataset2$name,
-        selected_keys = selected_keys()
+        comparison_datetime = comparison_result()$metadata$datetime,
+        dataset1_name = comparison_result()$metadata$name1,
+        dataset2_name = comparison_result()$metadata$name2,
+        selected_keys = comparison_result()$unique_keys
       ),
+
 
       tags$hr(style = "border-top: 2px solid #888; margin-top: 20px; margin-bottom: 20px;"),
 
       tags$h2("Structure and Content Checks"),
 
-      # structure_content_check_html(dataset1(), dataset2()),
-      comparison_result()$results_structure_ui,
+      structure_content_check_html(comparison_result()$structure_checks),
 
       tags$h3("Structure and Content Checks Comment", actionButton("structure_and_content_btn", "Edit Comment")),
       uiOutput("structure_and_content_display"),
@@ -254,10 +272,11 @@ server <- function(input, output, session) {
     } else{
       tagList(
         tags$p("Unique keys have been defined"),
-        comparison_result()$results_row_level_ui,
+
+        row_level_check_html(comparison_result()$row_level_checks, comparison_result()$unique_keys),
 
         tags$h3("Row-Level Checks", actionButton("row_level_btn", "Edit Comment")),
-        uiOutput("row_level_display"),
+        uiOutput("row_level_display")
       )
     },
 
@@ -344,11 +363,11 @@ server <- function(input, output, session) {
         input = "report_template.Rmd",
         output_file = temp_report,
         params = list(
-          unique_keys = selected_keys(),
+          # unique_keys = selected_keys(),
           comparison_result = comparison_result(),
-          comments = reactiveValuesToList(comments),
-          date_time = reactiveValuesToList(comparisonDate),
-          datasets = list(dataset1_name = input$dataset1$name, dataset2_name = input$dataset2$name)
+          comments = reactiveValuesToList(comments)
+          # date_time = reactiveValuesToList(comparisonDate),
+          # datasets = list(dataset1_name = input$dataset1$name, dataset2_name = input$dataset2$name)
 
         ),
         envir = new.env(parent = globalenv())  # Prevents polluting global env

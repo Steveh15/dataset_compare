@@ -13,6 +13,8 @@ library(tidyr)
 library(DT)
 library(htmlTable)
 
+rm(list = ls())
+
 
 source("utils/generate_test_data.R")
 

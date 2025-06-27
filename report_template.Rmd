@@ -2,15 +2,8 @@
 title: "ADPP/ADPP-like comparison report"
 output: html_document
 params:
-  unique_keys: NULL
   comparison_result: NULL
-  row_count_result: NULL
-  column_count_result: NULL
-  rounding_result: NULL
-  value_result: NULL
   comments: NULL
-  date_time: NULL
-  datasets: NULL
 ---
 
 ```{r setup, include=FALSE}
@@ -26,11 +19,10 @@ library(knitr)
 
 ```{r unique_keys}
       report_metadata_ui(
-        comparison_date = params$date_time$date,
-        comparison_time = params$date_time$time,
-        dataset1_name = params$datasets$dataset1_name,
-        dataset2_name = params$datasets$dataset2_name,
-        selected_keys = params$unique_keys
+        comparison_date = params$comparison_result$metadata$datetime,
+        dataset1_name = params$comparison_result$metadata$name1,
+        dataset2_name = params$comparison_result$metadata$name2,
+        selected_keys = params$comparison_result$unique_keys
       )
 ```
 
@@ -40,7 +32,9 @@ library(knitr)
 ## Structure and Content Checks
 
 ```{r structure_output}
-params$comparison_result$results_structure_ui
+# params$comparison_result$results_structure_ui
+structure_content_check_html(params$comparison_result$structure_checks)
+
 
 if (nzchar(params$comments$structure_and_content)) {
   comment_text <- paste0("### Structure and Content Checks Comment\n", params$comments$structure_and_content)
@@ -48,18 +42,18 @@ if (nzchar(params$comments$structure_and_content)) {
 }
 ```
 
----
+<!-- --- -->
 
-## Row-Level Checks
+<!-- ## Row-Level Checks -->
 
 
-```{r row_level_output}
-params$comparison_result$results_row_level_ui
+<!-- ```{r row_level_output} -->
+<!-- params$comparison_result$results_row_level_ui -->
 
-if (nzchar(params$comments$row_level)) {
-  comment_text <- paste0("### Row-Level Checks Comment\n", params$comments$row_level)
-  knitr::asis_output(comment_text)
-}
-```
+<!-- if (nzchar(params$comments$row_level)) { -->
+<!--   comment_text <- paste0("### Row-Level Checks Comment\n", params$comments$row_level) -->
+<!--   knitr::asis_output(comment_text) -->
+<!-- } -->
+<!-- ``` -->
 
----
+<!-- --- -->

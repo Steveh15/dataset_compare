@@ -60,7 +60,9 @@ df2 <- df2 %>%
       PPTESTCD == "CLST" ~ round(AVAL, 4),
       PPTESTCD == "LAMZNPT" ~ round(AVAL, 0),
       .default = AVAL
-    )
+    ),
+
+    TRT01A = toupper(TRT01A)
   )
 
 
