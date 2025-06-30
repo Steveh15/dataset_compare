@@ -26,6 +26,7 @@ ui <- function(request) {
                    titlePanel("ADPP Compare"),
 
                    compare_ui
+
                  )
         ),
         tabPanel("Information About the App",

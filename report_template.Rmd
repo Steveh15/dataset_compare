@@ -19,10 +19,8 @@ library(knitr)
 
 ```{r unique_keys}
       report_metadata_ui(
-        comparison_date = params$comparison_result$metadata$datetime,
-        dataset1_name = params$comparison_result$metadata$name1,
-        dataset2_name = params$comparison_result$metadata$name2,
-        unique_keys = params$comparison_result$unique_keys
+        metadata = params$metadata,
+        unique_keys = params$unique_keys
       )
 ```
 

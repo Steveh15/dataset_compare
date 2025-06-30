@@ -180,7 +180,7 @@ compareDatasets <- function(df1, df2, unique_keys = NULL, metadata = NULL) {
     row_level_checks$other_vars_comparison <- other_vars_comparison
 
 
-  # --- Combine into results object
+    # --- Combine into results object
     results$row_level_checks <- row_level_checks
   } else{
     results$row_level_checks <- NULL
@@ -204,26 +204,28 @@ compareDatasets <- function(df1, df2, unique_keys = NULL, metadata = NULL) {
 
 
 report_metadata_ui <- function(
-    comparison_datetime,
-    dataset1_name,
-    dataset2_name,
-    unique_keys = NULL) {
+    metadata,
+    unique_keys = NULL
+    # comparison_datetime,
+    # dataset1_name,
+    # dataset2_name,
+) {
   tagList(
 
     tags$table(style = "width: auto; margin-bottom: 1em;", tags$tbody(
       tags$tr(
         tags$th("Generated:", style = "text-align: left; padding-right: 10px;"),
 
-        tags$td(paste0(format(comparison_datetime, "%d-%b-%Y"), " ", format(comparison_datetime, "%H:%M")))
+        tags$td(paste0(format(metadata$datetime, "%d-%b-%Y"), " ", format(metadata$datetime, "%H:%M")))
 
       ),
       tags$tr(
         tags$th("Dataset 1:", style = "text-align: left; padding-right: 10px;"),
-        tags$td(dataset1_name)
+        tags$td(paste0(metadata$path1, "/", metadata$name1))
       ),
       tags$tr(
         tags$th("Dataset 2:", style = "text-align: left; padding-right: 10px;"),
-        tags$td(dataset2_name)
+        tags$td(paste0(metadata$path1, "/", metadata$name1))
       ),
       tags$tr(
         tags$th("Unique Keys:", style = "text-align: left; padding-right: 10px;"),
@@ -329,94 +331,101 @@ structure_content_check_html <- function(structure_checks) {
 
 
 
-row_level_check_html <- function(row_level_checks, unique_keys, markdown = FALSE){
+row_level_check_html <- function(row_level_checks, unique_keys = NULL, markdown = FALSE){
 
+  if(is.null(unique_keys)){
 
+    html_output <- tags$p("Unique keys have not been defined. No row-level checks have been performed.")
+  } else{
 
-  html_output <- tagList(
+    html_output <- tagList(
+      tags$p("Unique keys have been defined."),
 
-    tags$h3("Unmatched Records"),
+      tags$h3("Unmatched Records"),
 
-    if(nrow(row_level_checks$mismatched_rows) == 0){
-      tags$p(paste("There are no mismatched records in the ADPP and ADPP-like datasets"))
-    } else{
-      tags$div(
-        tags$p(paste("There are records which appear in only ADPP or ADPP-like but not both")),
-        DT::datatable(
-          row_level_checks$mismatched_rows,
-          options = list(pageLength = 5),
-          class = "display",
-          rownames = FALSE,
-          width = 500,
-          colnames = c("ADPP or ADPP-like", unique_keys, "Row number")
-        )
-      )
-    },
-
-
-    tags$h2("AVAL comparison"),
-
-    if(nrow(row_level_checks$aval_comparison$aval_diffs) == 0){
-      tags$p("No differences were detected in AVAL between ADPP or ADPP-like.")
-    } else{
-      tags$div(
-        tags$p("Differences were detected in AVAL between ADPP or ADPP-like."),
-        tags$h3("AVAL differences summary"),
-        htmlTable(
-          row_level_checks$aval_comparison$aval_summary,
-          rnames = FALSE,
-          css.cell = "padding: 5px; text-align: left;", # Cell styles
-          css.table = "border: 1px solid black; width: 40%;" # Table styles
-        ),
-        tags$h3("AVAL differences table"),
-        DT::datatable(
-          row_level_checks$aval_comparison$aval_diffs,
-          options = list(pageLength = 5),
-          class = "display",
-          rownames = FALSE,
-          width = 500,
-          colnames = c(unique_keys, "AVAL ADPP", "AVAL ADPP-like", "Difference detected")
-        )
-
-      )
-    },
-
-
-    if(!markdown){
-
-      tags$div(
-        tags$h2("All Other Variables Comparison"),
-
-        if(nrow(row_level_checks$other_vars_comparison$all_diffs) == 0){
-          tags$p("No differences were detected in AVAL between ADPP or ADPP-like.")
-        } else{
-          tabsetPanel(
-            tabPanel("All Differences",
-                     DT::datatable(
-                       row_level_checks$other_vars_comparison$all_diffs,
-                       options = list(pageLength = 5),
-                       class = "display",
-                       rownames = FALSE,
-                       width = 500,
-                       colnames = c(unique_keys, "Variable name", "ADPP", "ADPP-like")
-                     )),
-            tabPanel("Distinct Difference Only",
-                     DT::datatable(
-                       row_level_checks$other_vars_comparison$unique_diffs,
-                       options = list(pageLength = 5),
-                       class = "display",
-                       rownames = FALSE,
-                       width = 500,
-                       colnames = c("Variable name", "ADPP", "ADPP-like")
-                     ))
+      if(nrow(row_level_checks$mismatched_rows) == 0){
+        tags$p(paste("There are no mismatched records in the ADPP and ADPP-like datasets."))
+      } else{
+        tags$div(
+          tags$p(paste("There are records which appear in only ADPP or ADPP-like but not both.")),
+          DT::datatable(
+            row_level_checks$mismatched_rows,
+            options = list(pageLength = 5),
+            class = "display",
+            rownames = FALSE,
+            width = 500,
+            colnames = c("ADPP or ADPP-like", unique_keys, "Row number")
           )
-        }
-      )
-
-    }
+        )
+      },
 
 
-  )
+      tags$h2("AVAL comparison"),
+
+      if(nrow(row_level_checks$aval_comparison$aval_diffs) == 0){
+        tags$p("No differences were detected in AVAL between ADPP or ADPP-like.")
+      } else{
+        tags$div(
+          tags$p("Differences were detected in AVAL between ADPP or ADPP-like."),
+          tags$h3("AVAL differences summary"),
+          htmlTable(
+            row_level_checks$aval_comparison$aval_summary,
+            rnames = FALSE,
+            css.cell = "padding: 5px; text-align: left;", # Cell styles
+            css.table = "border: 1px solid black; width: 40%;" # Table styles
+          ),
+          tags$h3("AVAL differences table"),
+          DT::datatable(
+            row_level_checks$aval_comparison$aval_diffs,
+            options = list(pageLength = 5),
+            class = "display",
+            rownames = FALSE,
+            width = 500,
+            colnames = c(unique_keys, "AVAL ADPP", "AVAL ADPP-like", "Difference detected")
+          )
+
+        )
+      },
+
+
+      if(!markdown){
+
+        tags$div(
+          tags$h2("All Other Variables Comparison"),
+
+          if(nrow(row_level_checks$other_vars_comparison$all_diffs) == 0){
+            tags$p("No differences were detected in AVAL between ADPP or ADPP-like.")
+          } else{
+            tabsetPanel(
+              tabPanel("All Differences",
+                       DT::datatable(
+                         row_level_checks$other_vars_comparison$all_diffs,
+                         options = list(pageLength = 5),
+                         class = "display",
+                         rownames = FALSE,
+                         width = 500,
+                         colnames = c(unique_keys, "Variable name", "ADPP", "ADPP-like")
+                       )),
+              tabPanel("Distinct Difference Only",
+                       DT::datatable(
+                         row_level_checks$other_vars_comparison$unique_diffs,
+                         options = list(pageLength = 5),
+                         class = "display",
+                         rownames = FALSE,
+                         width = 500,
+                         colnames = c("Variable name", "ADPP", "ADPP-like")
+                       ))
+            )
+          }
+        )
+
+      }
+
+
+    )
+  }
+
+
 
 
   return(html_output)

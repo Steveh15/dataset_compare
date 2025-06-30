@@ -4,6 +4,7 @@ library(dplyr)
 library(stringr)
 library(shinyBS)
 library(htmlwidgets)
+library(shinyWidgets)
 
 # For testing
 # library(pharmaverseadam)

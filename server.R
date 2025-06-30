@@ -16,6 +16,23 @@ server <- function(input, output, session) {
   })
 
 
+  output$file_path_input_1 <- renderUI({
+    if (isTRUE(input$include_paths)) {
+      tagList(
+        textInput("file_path_1", "File path for Dataset 1")
+      )
+    }
+  })
+
+  output$file_path_input_2 <- renderUI({
+    if (isTRUE(input$include_paths)) {
+      tagList(
+        textInput("file_path_2", "File path for Dataset 2")
+      )
+    }
+  })
+
+
   # Reactive values to hold the datasets
   dataset1 <- reactive({
     if (input$load_test_data) {
@@ -141,9 +158,18 @@ server <- function(input, output, session) {
     req(dataset1)
     req(dataset2)
 
+    if (isTRUE(input$include_paths)) {
+      path1 <- input$file_path_1
+      path2 <- input$file_path_2
+    } else{
+      path1 <- ""
+      path2 <- ""
+    }
+
+
     metadata_list <- list(
-      path1 = "path1",
-      path2 = "path2",
+      path1 = path1,
+      path2 = path2,
       name1 = "name1.xpt",
       name2 = "name2.xpt",
       datetime = Sys.time()
@@ -201,9 +227,7 @@ server <- function(input, output, session) {
       tags$h2("Comparison Run Information"),
 
       report_metadata_ui(
-        comparison_datetime = comparison_result()$metadata$datetime,
-        dataset1_name = comparison_result()$metadata$name1,
-        dataset2_name = comparison_result()$metadata$name2,
+        metadata = comparison_result()$metadata,
         unique_keys = comparison_result()$unique_keys
       ),
 
@@ -221,18 +245,13 @@ server <- function(input, output, session) {
 
       tags$h2("Row-Level Checks"),
 
-    if(is.null(comparison_result()$unique_keys)){
-      tags$p("Unique keys have not been defined. No row-level checks have been performed")
-    } else{
-      tagList(
-        tags$p("Unique keys have been defined"),
-
-        row_level_check_html(comparison_result()$row_level_checks, comparison_result()$unique_keys),
-
-        tags$h3("Row-Level Checks", actionButton("row_level_btn", "Edit Comment")),
-        uiOutput("row_level_display")
-      )
-    },
+      row_level_check_html(comparison_result()$row_level_checks, comparison_result()$unique_keys),
+      if(!is.null(comparison_result()$unique_keys)){
+        tagList(
+            tags$h3("Row-Level Checks", actionButton("row_level_btn", "Edit Comment")),
+            uiOutput("row_level_display")
+        )
+      }
 
     )
   })

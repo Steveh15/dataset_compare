@@ -4,8 +4,8 @@
 unique_keys <- c("USUBJID", "ID")
 
 metadata<- list(
-  path1 = "path1",
-  path2 = "path2",
+  path1 = "pathad1",
+  path2 = "path dsa2",
   name1 = "name1.xpt",
   name2 = "name2.xpt",
   datetime = Sys.time()
@@ -36,3 +36,7 @@ rmarkdown::render(
 
 
 browseURL(temp_report)
+
+
+
+?showModal
