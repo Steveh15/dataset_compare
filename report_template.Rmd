@@ -19,8 +19,8 @@ library(knitr)
 
 ```{r unique_keys}
       report_metadata_ui(
-        metadata = params$metadata,
-        unique_keys = params$unique_keys
+        metadata = params$comparison_result$metadata,
+        unique_keys = params$comparison_result$unique_keys
       )
 ```
 

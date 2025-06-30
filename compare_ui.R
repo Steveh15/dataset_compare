@@ -2,13 +2,6 @@
 
 
 sidebar_content <- tagList(
-
-  # checkboxInput("load_test_data", "Load test data", value = FALSE),
-
-    div(id = "load_test_data_wrapper",
-        checkboxInput("load_test_data", "Load test data", value = FALSE)
-    ),
-
   checkboxInput("include_paths", "Include file paths for report?", value = FALSE),
   uiOutput("file_path_input_1"),
   fileInput("dataset1", "Upload ADPP (.xpt):", accept = c(".xpt")),

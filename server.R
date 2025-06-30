@@ -7,15 +7,6 @@ server <- function(input, output, session) {
   #
   ##############################################################################
 
-  observe({
-    if (!dev_mode) {
-      shinyjs::hide("load_test_data_wrapper")
-    } else {
-      shinyjs::show("load_test_data_wrapper")
-    }
-  })
-
-
   output$file_path_input_1 <- renderUI({
     if (isTRUE(input$include_paths)) {
       tagList(
@@ -35,23 +26,13 @@ server <- function(input, output, session) {
 
   # Reactive values to hold the datasets
   dataset1 <- reactive({
-    if (input$load_test_data) {
-      return (df1)
-    }
-    else if (is.null(input$dataset1)) {
-      return(NULL)  # Return NULL if no file is uploaded
-    }
+    req(input$dataset1)
     haven::read_xpt(input$dataset1$datapath)
 
   })
 
   dataset2 <- reactive({
-    if (input$load_test_data) {
-      return (df2)
-    }
-    else if (is.null(input$dataset2)) {
-      return(NULL)  # Return NULL if no file is uploaded
-    }
+    req(input$dataset2)
     haven::read_xpt(input$dataset2$datapath)
 
   })
@@ -322,11 +303,7 @@ server <- function(input, output, session) {
 
   output$download_report <- downloadHandler(
     filename = function() {
-      if(dev_mode){
-        "comparison_report.html"
-      } else{
         paste0("adpp_comparison_report_",format(Sys.Date(), "%Y_%m_%d"),"T",format(Sys.time(), "%H_%M"),".html")
-      }
     },
     content = function(file) {
       # Save to a temporary file first
