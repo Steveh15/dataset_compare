@@ -20,6 +20,16 @@ rm(list = ls())
 source("utils/generate_test_data.R")
 
 
+### App version
+
+app_contact_person <- "Stephen Mackie"
+app_contact_person_email <- "test"
+app_version<- 1.0
+app_release_date <- "Today"
+
+knit("info.Rmd", quiet = TRUE)
+
+
 # df1 <- haven::read_xpt(file.path("data", "df1.xpt"))
 # df2 <- haven::read_xpt(file.path("data", "df2.xpt"))
 

@@ -177,7 +177,18 @@ compareDatasets <- function(df1, df2, unique_keys = NULL, metadata = NULL) {
       as_tibble()
 
 
+    sum_all <- other_vars_comparison$all_diffs %>%
+      count(var)
+    sum_unique <- other_vars_comparison$unique_diffs %>%
+      count(var)
+
+    other_vars_comparison$summary <- sum_all %>% full_join(sum_unique, by = "var") %>%
+      rename(n_diff = n.x, n_distinct_diff = n.y)
+
+
     row_level_checks$other_vars_comparison <- other_vars_comparison
+
+
 
 
     # --- Combine into results object
@@ -396,6 +407,17 @@ row_level_check_html <- function(row_level_checks, unique_keys = NULL, markdown 
           if(nrow(row_level_checks$other_vars_comparison$all_diffs) == 0){
             tags$p("No differences were detected in AVAL between ADPP or ADPP-like.")
           } else{
+            tagList(
+            tags$h3("Summary"),
+            DT::datatable(
+              row_level_checks$other_vars_comparison$summary,
+              options = list(pageLength = 5),
+              class = "display",
+              rownames = FALSE,
+              width = 500,
+              colnames = c("Variable", "Differences detected", "Distinct differences detected")
+            ),
+            tags$h3("Differences table"),
             tabsetPanel(
               tabPanel("All Differences",
                        DT::datatable(
@@ -415,6 +437,7 @@ row_level_check_html <- function(row_level_checks, unique_keys = NULL, markdown 
                          width = 500,
                          colnames = c("Variable name", "ADPP", "ADPP-like")
                        ))
+            )
             )
           }
         )

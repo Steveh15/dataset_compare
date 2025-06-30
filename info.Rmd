@@ -1,12 +1,12 @@
 
 <!-- ### Contact -->
 
-<!-- Stephen Mackie [smackie@its.jnj.com](mailto:test) -->
+<!-- `r app_contact_person` [smackie@its.jnj.com]`r paste0('(mailto:',app_contact_person_email,')')` -->
 
 <!-- ### App version  -->
 
-<!-- App version: 1 -->
-<!-- App version release date: Today -->
+<!-- App version: `r app_version` -->
+<!-- App version release date: `r app_release_date` -->
 
 <!-- ### Objectives of why the App was built and what it does -->
 
@@ -26,12 +26,12 @@
 
 ### Contact
 
-Stephen Mackie [smackie@its.jnj.com](mailto:test)
+`r app_contact_person` [smackie@its.jnj.com]`r paste0('(mailto:',app_contact_person_email,')')`
 
 ### App version
 
-App version: 1
-App version release date: Today
+App version: `r app_version`
+App version release date: `r app_release_date`
 
 
 #### Purpose
