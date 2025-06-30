@@ -44,9 +44,6 @@ server <- function(input, output, session) {
   #
   ##############################################################################
 
-  selected_keys <- reactiveVal(NULL)
-
-
   # Find common variables between the two datasets
   common_vars <- reactive({
     req(dataset1(), dataset2())
@@ -126,10 +123,6 @@ server <- function(input, output, session) {
   comparison_data <- reactiveVal(NULL)
   comparison_result <- reactiveVal(NULL)
 
-  # comparisonDate <- reactiveValues(
-  #   date = "",
-  #   time = ""
-  # )
 
   output$compare_btn_ui <- renderUI({
     # Disable if datasets don't exist, or if unique keys have been requested but the keys aren't valid
@@ -157,15 +150,13 @@ server <- function(input, output, session) {
       )
 
     if (input$unique_keys_check & valid_keys()) {
-      selected_keys(input$key_vars)
       compare_list <- compareDatasets(
         df1 = dataset1(),
         df2 = dataset2(),
-        unique_keys = selected_keys(),
+        unique_keys = input$key_vars,
         metadata = metadata_list
         )
     } else{
-      selected_keys(NULL)
       compare_list <- compareDatasets(
         df1 = dataset1(),
         df2 = dataset2(),
@@ -173,8 +164,7 @@ server <- function(input, output, session) {
         metadata = metadata_list
       )
     }
-    # comparisonDate$date <- Sys.Date()
-    # comparisonDate$time <- Sys.time()
+
     comparison_data(list(dataset1, dataset2))
     comparison_result(compare_list)
   })
@@ -183,42 +173,6 @@ server <- function(input, output, session) {
   output$comparison_result <- renderPrint({
     comparison_result()
   })
-
-  #
-  # --- UI components
-  #
-  ##############################################################################
-
-
-  output$row_count_check_output <- renderUI({
-    req(comparison_result()$row_count_check)
-
-    row_count_check_ui(result = comparison_result()$row_count_check,
-                       unique_keys = selected_keys())
-  })
-
-
-  output$column_count_check_output <- renderUI({
-    req(comparison_result()$column_count_check)
-
-    column_count_check_ui(result = comparison_result()$column_count_check,
-                          unique_keys = selected_keys())
-  })
-
-  output$rounding_check_output <- renderUI({
-    req(comparison_result()$rounding_check)
-
-    rounding_check_ui(result = comparison_result()$rounding_check)
-  })
-
-  output$value_check_output <- renderUI({
-    req(comparison_result()$value_check)
-
-    value_check_ui(result = comparison_result()$value_check,
-                   unique_keys = selected_keys())
-  })
-
-
 
 
   #
@@ -250,7 +204,7 @@ server <- function(input, output, session) {
         comparison_datetime = comparison_result()$metadata$datetime,
         dataset1_name = comparison_result()$metadata$name1,
         dataset2_name = comparison_result()$metadata$name2,
-        selected_keys = comparison_result()$unique_keys
+        unique_keys = comparison_result()$unique_keys
       ),
 
 
@@ -363,12 +317,8 @@ server <- function(input, output, session) {
         input = "report_template.Rmd",
         output_file = temp_report,
         params = list(
-          # unique_keys = selected_keys(),
           comparison_result = comparison_result(),
           comments = reactiveValuesToList(comments)
-          # date_time = reactiveValuesToList(comparisonDate),
-          # datasets = list(dataset1_name = input$dataset1$name, dataset2_name = input$dataset2$name)
-
         ),
         envir = new.env(parent = globalenv())  # Prevents polluting global env
       )

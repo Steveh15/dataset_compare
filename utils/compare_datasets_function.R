@@ -1,11 +1,4 @@
 
-
-
-
-
-files <- list.files("utils/comparison_functions", full.names = TRUE, pattern = "\\.R$")
-sapply(files, source)
-
 rounding_check <- function(df1, df2, precision = 10) {
 
   dp_list <- list(df1, df2) %>% lapply(function(x)
@@ -47,9 +40,6 @@ compareDatasets <- function(df1, df2, unique_keys = NULL, metadata = NULL) {
   } else{
     compare_summary <- summary(arsenal::comparedf(df1, df2))
   }
-
-  # compare_summary <- summary(arsenal::comparedf(df1, df2))
-
 
   # --- Structural Checks
   #############################################################################
@@ -110,9 +100,11 @@ compareDatasets <- function(df1, df2, unique_keys = NULL, metadata = NULL) {
       ) %>%
       mutate(
 
-        tol1  = abs(values.x - values.y) >= 1e-3,
-        tol2  = abs(values.x - values.y) >= 1e-6,
-        tol3  = abs(values.x - values.y) >= 1e-9,
+        diff = abs(values.x - values.y),
+        tol1 = diff >= 1e-3,
+        tol2 = diff >= 1e-6,
+        tol3 = diff >= 1e-9,
+        tol4 = diff < 1e-9,
 
         tol_na =  (is.na(values.x) & !is.na(values.y) ) | (!is.na(values.x) & is.na(values.y) ),
 
@@ -122,7 +114,8 @@ compareDatasets <- function(df1, df2, unique_keys = NULL, metadata = NULL) {
           tol_na ~ "Missing",
           tol1 ~ ">= 1e-3",
           !tol1 & tol2  ~ ">= 1e-6",
-          !tol2 & tol3 ~ ">= 1e-9"
+          !tol2 & tol3 ~ ">= 1e-9",
+          !tol3 & tol4 ~ "< 1e-9",
 
         )
 
@@ -136,6 +129,7 @@ compareDatasets <- function(df1, df2, unique_keys = NULL, metadata = NULL) {
         tol1_sum = sum(tol1, na.rm = TRUE),
         tol2_sum = sum(tol2 & !tol1, na.rm = TRUE),
         tol3_sum = sum(tol3 & !tol2, na.rm = TRUE),
+        tol4_sum = sum(tol4 & !tol3, na.rm = TRUE),
         tolna_sum = sum(tol_na, na.rm = TRUE)
       ) %>%
       pivot_longer(cols = everything()) %>%
@@ -146,6 +140,7 @@ compareDatasets <- function(df1, df2, unique_keys = NULL, metadata = NULL) {
           "tol1_sum"   ~ "∆ ≥ 1e-3",
           "tol2_sum"   ~ "1e-3 > ∆ ≥ 1e-6",
           "tol3_sum"   ~ "1e-6 > ∆ ≥ 1e-9",
+          "tol4_sum"   ~ "∆ < 1e-9",
           "tolna_sum"  ~ "AVAL missing in one dataset"
         ),
         value = as.character(value)
@@ -212,7 +207,7 @@ report_metadata_ui <- function(
     comparison_datetime,
     dataset1_name,
     dataset2_name,
-    selected_keys = NULL) {
+    unique_keys = NULL) {
   tagList(
 
     tags$table(style = "width: auto; margin-bottom: 1em;", tags$tbody(
@@ -232,9 +227,9 @@ report_metadata_ui <- function(
       ),
       tags$tr(
         tags$th("Unique Keys:", style = "text-align: left; padding-right: 10px;"),
-        tags$td(if (!is.null(selected_keys) &&
-                    length(selected_keys) > 0) {
-          paste(selected_keys, collapse = ", ")
+        tags$td(if (!is.null(unique_keys) &&
+                    length(unique_keys) > 0) {
+          paste(unique_keys, collapse = ", ")
         } else {
           tags$em("No unique keys defined")
         })
@@ -262,9 +257,9 @@ structure_content_check_html <- function(structure_checks) {
       tags$p(paste("ADPP has", structure_checks$row_difference["df1_rows"], "rows.")),
       tags$p(paste("ADPP-like has", structure_checks$row_difference["df2_rows"], "rows.")),
       if(structure_checks$row_difference["row_diff"] > 0){
-        tags$p(style = "font-weight: bold; color: red;",paste("Difference in number of rows:", structure_checks$row_difference["row_diff"]))
+        tags$p(style = "font-weight: bold;",paste("Difference in number of rows:", structure_checks$row_difference["row_diff"]))
       } else{
-        tags$p(style = "font-weight: bold; color: green;",paste("Difference in number of rows:", structure_checks$row_difference["row_diff"]))
+        tags$p(style = "font-weight: bold;",paste("Difference in number of rows:", structure_checks$row_difference["row_diff"]))
       }
 
     ),
@@ -327,8 +322,14 @@ structure_content_check_html <- function(structure_checks) {
 
 }
 
+#############################################################################
+# --- row level check UI
+#############################################################################
+#############################################################################
 
-row_level_check_html <- function(row_level_checks, unique_keys){
+
+
+row_level_check_html <- function(row_level_checks, unique_keys, markdown = FALSE){
 
 
 
@@ -380,39 +381,44 @@ row_level_check_html <- function(row_level_checks, unique_keys){
       )
     },
 
-    tags$h2("All Other Variables Comparison"),
 
-    if(nrow(row_level_checks$other_vars_comparison$all_diffs) == 0){
-      tags$p("No differences were detected in AVAL between ADPP or ADPP-like.")
-    } else{
-      tabsetPanel(
-        tabPanel("All Differences",
-                 DT::datatable(
-                   row_level_checks$other_vars_comparison$all_diffs,
-                   options = list(pageLength = 5),
-                   class = "display",
-                   rownames = FALSE,
-                   width = 500,
-                   colnames = c(unique_keys, "Variable name", "ADPP", "ADPP-like")
-                 )),
-        tabPanel("Distinct Difference Only",
-                 DT::datatable(
-                   row_level_checks$other_vars_comparison$unique_diffs,
-                   options = list(pageLength = 5),
-                   class = "display",
-                   rownames = FALSE,
-                   width = 500,
-                   colnames = c("Variable name", "ADPP", "ADPP-like")
-                 ))
+    if(!markdown){
+
+      tags$div(
+        tags$h2("All Other Variables Comparison"),
+
+        if(nrow(row_level_checks$other_vars_comparison$all_diffs) == 0){
+          tags$p("No differences were detected in AVAL between ADPP or ADPP-like.")
+        } else{
+          tabsetPanel(
+            tabPanel("All Differences",
+                     DT::datatable(
+                       row_level_checks$other_vars_comparison$all_diffs,
+                       options = list(pageLength = 5),
+                       class = "display",
+                       rownames = FALSE,
+                       width = 500,
+                       colnames = c(unique_keys, "Variable name", "ADPP", "ADPP-like")
+                     )),
+            tabPanel("Distinct Difference Only",
+                     DT::datatable(
+                       row_level_checks$other_vars_comparison$unique_diffs,
+                       options = list(pageLength = 5),
+                       class = "display",
+                       rownames = FALSE,
+                       width = 500,
+                       colnames = c("Variable name", "ADPP", "ADPP-like")
+                     ))
+          )
+        }
       )
-    },
+
+    }
 
 
-    # NOTE: Other differences html display requires tab which need to be done in Shiny
+  )
 
 
-
-    )
+  return(html_output)
 
 }
-
