@@ -3,11 +3,42 @@
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
 
+  # --- Dataset Input
+  #
+  ##############################################################################
+
+  observe({
+    if (!dev_mode) {
+      shinyjs::hide("load_test_data_wrapper")
+    } else {
+      shinyjs::show("load_test_data_wrapper")
+    }
+  })
+
+
+  output$file_path_input_1 <- renderUI({
+    if (isTRUE(input$include_paths)) {
+      tagList(
+        textInput("file_path_1", "File path for Dataset 1")
+      )
+    }
+  })
+
+  output$file_path_input_2 <- renderUI({
+    if (isTRUE(input$include_paths)) {
+      tagList(
+        textInput("file_path_2", "File path for Dataset 2")
+      )
+    }
+  })
 
 
   # Reactive values to hold the datasets
   dataset1 <- reactive({
-    if (is.null(input$dataset1)) {
+    if (input$load_test_data) {
+      return (df1)
+    }
+    else if (is.null(input$dataset1)) {
       return(NULL)  # Return NULL if no file is uploaded
     }
     haven::read_xpt(input$dataset1$datapath)
@@ -15,7 +46,10 @@ server <- function(input, output, session) {
   })
 
   dataset2 <- reactive({
-    if (is.null(input$dataset2)) {
+    if (input$load_test_data) {
+      return (df2)
+    }
+    else if (is.null(input$dataset2)) {
       return(NULL)  # Return NULL if no file is uploaded
     }
     haven::read_xpt(input$dataset2$datapath)
@@ -23,30 +57,15 @@ server <- function(input, output, session) {
   })
 
 
-  output$compare_btn_ui <- renderUI({
-    # Disable if datasets don't exist, or if unique keys have been requested but the keys aren't valid
-    if (is.null(dataset1()) ||
-        is.null(dataset2()) ||
-        (input$unique_keys_check & !valid_keys())) {
-      actionButton("compare_btn", "Compare Datasets", disabled = TRUE)
-    } else {
-      # Both datasets are present, enable the button
-      actionButton("compare_btn", "Compare Datasets")
-    }
-
-
-  })
-
+  # --- Unique Keys Definition
+  #
+  ##############################################################################
 
   # Find common variables between the two datasets
   common_vars <- reactive({
     req(dataset1(), dataset2())
     intersect(colnames(dataset1()), colnames(dataset2()))
   })
-
-
-  selected_keys <- reactiveVal(NULL)
-
 
   # Dynamically render dropdown menus for selecting keys
   output$key_selector_ui <- renderUI({
@@ -107,7 +126,6 @@ server <- function(input, output, session) {
       }
 
     }
-
     return(msg)
   })
 
@@ -115,31 +133,64 @@ server <- function(input, output, session) {
 
 
 
+  # --- Perform Comparison
+  #
+  ##############################################################################
 
   comparison_data <- reactiveVal(NULL)
-
   comparison_result <- reactiveVal(NULL)
-  # comparisonDate <- reactiveVal(NULL)
-  comparisonDate <- reactiveValues(
-    date = "",
-    time = ""
-  )
+
+
+  output$compare_btn_ui <- renderUI({
+    # Disable if datasets don't exist, or if unique keys have been requested but the keys aren't valid
+    if (is.null(dataset1()) ||
+        is.null(dataset2()) ||
+        (input$unique_keys_check & !valid_keys())) {
+      actionButton("compare_btn", "Compare Datasets", disabled = TRUE)
+    } else {
+      # Both datasets are present, enable the button
+      actionButton("compare_btn", "Compare Datasets")
+    }
+  })
+
 
   observeEvent(input$compare_btn, {
     req(dataset1)
     req(dataset2)
 
+    if (isTRUE(input$include_paths)) {
+      path1 <- input$file_path_1
+      path2 <- input$file_path_2
+    } else{
+      path1 <- ""
+      path2 <- ""
+    }
 
+
+    metadata_list <- list(
+      path1 = path1,
+      path2 = path2,
+      name1 = "name1.xpt",
+      name2 = "name2.xpt",
+      datetime = Sys.time()
+      )
 
     if (input$unique_keys_check & valid_keys()) {
-      selected_keys(input$key_vars)
-      compare_list <- compareDatasets(dataset1(), dataset2(), selected_keys())
+      compare_list <- compareDatasets(
+        df1 = dataset1(),
+        df2 = dataset2(),
+        unique_keys = input$key_vars,
+        metadata = metadata_list
+        )
     } else{
-      selected_keys(NULL)
-      compare_list <- compareDatasets(dataset1(), dataset2())
+      compare_list <- compareDatasets(
+        df1 = dataset1(),
+        df2 = dataset2(),
+        unique_keys = NULL,
+        metadata = metadata_list
+      )
     }
-    comparisonDate$date <- Sys.Date()
-    comparisonDate$time <- Sys.time()
+
     comparison_data(list(dataset1, dataset2))
     comparison_result(compare_list)
   })
@@ -148,42 +199,6 @@ server <- function(input, output, session) {
   output$comparison_result <- renderPrint({
     comparison_result()
   })
-
-  #
-  # --- UI components
-  #
-  ##############################################################################
-
-
-  output$row_count_check_output <- renderUI({
-    req(comparison_result()$row_count_check)
-
-    row_count_check_ui(result = comparison_result()$row_count_check,
-                       unique_keys = selected_keys())
-  })
-
-
-  output$column_count_check_output <- renderUI({
-    req(comparison_result()$column_count_check)
-
-    column_count_check_ui(result = comparison_result()$column_count_check,
-                          unique_keys = selected_keys())
-  })
-
-  output$rounding_check_output <- renderUI({
-    req(comparison_result()$rounding_check)
-
-    rounding_check_ui(result = comparison_result()$rounding_check)
-  })
-
-  output$value_check_output <- renderUI({
-    req(comparison_result()$value_check)
-
-    value_check_ui(result = comparison_result()$value_check,
-                   unique_keys = selected_keys())
-  })
-
-
 
 
   #
@@ -212,73 +227,32 @@ server <- function(input, output, session) {
       tags$h2("Comparison Run Information"),
 
       report_metadata_ui(
-        comparison_date = comparisonDate$date,
-        comparison_time = comparisonDate$time,
-        dataset1_name = input$dataset1$name,
-        dataset2_name = input$dataset2$name,
-        selected_keys = selected_keys()
+        metadata = comparison_result()$metadata,
+        unique_keys = comparison_result()$unique_keys
       ),
 
+
       tags$hr(style = "border-top: 2px solid #888; margin-top: 20px; margin-bottom: 20px;"),
-      # --- ######################################################################
 
       tags$h2("Structure and Content Checks"),
 
-      # structure_content_check_html(dataset1(), dataset2()),
-      comparison_result()$results_structure_ui,
+      structure_content_check_html(comparison_result()$structure_checks),
 
       tags$h3("Structure and Content Checks Comment", actionButton("structure_and_content_btn", "Edit Comment")),
       uiOutput("structure_and_content_display"),
 
       tags$hr(style = "border-top: 2px solid #888; margin-top: 20px; margin-bottom: 20px;"),
-      # --- ######################################################################
 
       tags$h2("Row-Level Checks"),
 
-    if(is.null(comparison_result()$unique_keys)){
-      comparison_result()$results_row_level_ui
-    } else{
-      tagList(
-        tags$p("Unique keys have been defined"),
-        comparison_result()$results_row_level_ui,
+      row_level_check_html(comparison_result()$row_level_checks, comparison_result()$unique_keys),
+      if(!is.null(comparison_result()$unique_keys)){
+        tagList(
+            tags$h3("Row-Level Checks", actionButton("row_level_btn", "Edit Comment")),
+            uiOutput("row_level_display")
+        )
+      }
 
-
-        tags$h2("All Other Variables Comparison"),
-
-        if(nrow(comparison_result()$other_diffs) == 0){
-          tags$p("No differences were detected in AVAL between ADPP or ADPP-like.")
-        } else{
-          tabsetPanel(
-            tabPanel("All Differences",
-                     DT::datatable(
-                       comparison_result()$other_diffs,
-                       options = list(pageLength = 5),
-                       class = "display",
-                       rownames = FALSE,
-                       width = 500,
-                       colnames = c(selected_keys(), "Variable name", "ADPP", "ADPP-like")
-                     )),
-            tabPanel("Distinct Difference Only",
-                     DT::datatable(
-                       comparison_result()$other_diffs_unique,
-                       options = list(pageLength = 5),
-                       class = "display",
-                       rownames = FALSE,
-                       width = 500,
-                       colnames = c("Variable name", "ADPP", "ADPP-like")
-                     ))
-          )
-        },
-
-        tags$h3("Row-Level Checks Comment", actionButton("row_level_btn", "Edit Comment")),
-        uiOutput("row_level_display"),
-      )
-
-
-    },
-
-    tags$hr(style = "border-top: 2px solid #888; margin-top: 20px; margin-bottom: 20px;"),
-    # --- ######################################################################
     )
   })
 
@@ -348,7 +322,11 @@ server <- function(input, output, session) {
 
   output$download_report <- downloadHandler(
     filename = function() {
+      if(dev_mode){
+        "comparison_report.html"
+      } else{
         paste0("adpp_comparison_report_",format(Sys.Date(), "%Y_%m_%d"),"T",format(Sys.time(), "%H_%M"),".html")
+      }
     },
     content = function(file) {
       # Save to a temporary file first
@@ -358,13 +336,8 @@ server <- function(input, output, session) {
         input = "report_template.Rmd",
         output_file = temp_report,
         params = list(
-          unique_keys = selected_keys(),
           comparison_result = comparison_result(),
-          comments = reactiveValuesToList(comments),
-          date_time = reactiveValuesToList(comparisonDate),
-          datasets = list(dataset1_name = input$dataset1$name, dataset2_name = input$dataset2$name),
-          other_diffs = comparison_result()$other_diffs,
-          other_diffs_unique = comparison_result()$other_diffs_unique
+          comments = reactiveValuesToList(comments)
         ),
         envir = new.env(parent = globalenv())  # Prevents polluting global env
       )

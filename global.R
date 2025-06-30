@@ -1,11 +1,10 @@
 
-rm(list = ls())
-
 library(shiny)
 library(dplyr)
 library(stringr)
 library(shinyBS)
 library(htmlwidgets)
+library(shinyWidgets)
 
 # For testing
 # library(pharmaverseadam)
@@ -14,6 +13,8 @@ library(tidyr)
 # library(shinyBS)
 library(DT)
 library(htmlTable)
+
+rm(list = ls())
 
 
 source("utils/generate_test_data.R")

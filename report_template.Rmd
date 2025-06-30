@@ -2,13 +2,8 @@
 title: "ADPP/ADPP-like comparison report"
 output: html_document
 params:
-  unique_keys: NULL
   comparison_result: NULL
   comments: NULL
-  date_time: NULL
-  datasets: NULL
-  other_diffs: NULL
-  other_diffs_unique: NULL
 ---
 
 ```{r setup, include=FALSE}
@@ -24,21 +19,19 @@ library(knitr)
 
 ```{r unique_keys}
       report_metadata_ui(
-        comparison_date = params$date_time$date,
-        comparison_time = params$date_time$time,
-        dataset1_name = params$datasets$dataset1_name,
-        dataset2_name = params$datasets$dataset2_name,
-        selected_keys = params$unique_keys
+        metadata = params$metadata,
+        unique_keys = params$unique_keys
       )
 ```
 
 ---
 
-
 ## Structure and Content Checks
 
 ```{r structure_output}
-params$comparison_result$results_structure_ui
+# params$comparison_result$results_structure_ui
+structure_content_check_html(params$comparison_result$structure_checks)
+
 
 if (nzchar(params$comments$structure_and_content)) {
   comment_text <- paste0("### Structure and Content Checks Comment\n", params$comments$structure_and_content)
@@ -48,59 +41,14 @@ if (nzchar(params$comments$structure_and_content)) {
 
 ---
 
-
 ## Row-Level Checks
 
 ```{r row_level_output}
+row_level_check_html(params$comparison_result$row_level_checks, params$comparison_result$unique_keys, markdown = FALSE)
 
-params$comparison_result$results_row_level_ui
-
-
-```
-
-```{r tabset_header, results='asis'}
-if(!is.null(params$unique_keys)){
-  knitr::asis_output("### All Other Variables Comparison {.tabset}")
-}
-```
-<!-- ### All Other Variables Comparison {.tabset} -->
-
-```{r all_diffs, results='asis'}
-
-if(!is.null(params$unique_keys)){
-  cat("#### All Differences")
-  DT::datatable(
-  params$other_diffs,
-  class = "display",
-  rownames = FALSE,
-  # width = 500,
-  colnames = c(params$unique_keys, "Variable name", "ADPP", "ADPP-like")
-  )
-}
-
-```
-
-```{r unique_diffs, results='asis'}
-if(!is.null(params$unique_keys)){
-  cat("#### Unique Differences")
-  DT::datatable(
-    params$other_diffs_unique,
-    class = "display",
-    rownames = FALSE,
-    # width = 500,
-    colnames = c("Variable name", "ADPP", "ADPP-like")
-   )
-}
-```
-
-```{r row_level_comment}
 if (nzchar(params$comments$row_level)) {
-  comment_text <- paste0("### Row Level Checks Comment\n", params$comments$row_level)
+  comment_text <- paste0("### Row-Level Checks Comment\n", params$comments$row_level)
   knitr::asis_output(comment_text)
 }
 
-
 ```
-
-
-
