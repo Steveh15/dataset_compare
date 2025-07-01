@@ -24,18 +24,69 @@ server <- function(input, output, session) {
   })
 
 
+  d1_validation_message <- reactiveVal("")
+  d2_validation_message <- reactiveVal("")
+  d1_is_valid <- reactiveVal(NULL)
+  d2_is_valid <- reactiveVal(NULL)
+
+
   # Reactive values to hold the datasets
   dataset1 <- reactive({
     req(input$dataset1)
-    haven::read_xpt(input$dataset1$datapath)
+    df <- haven::read_xpt(input$dataset1$datapath)
 
+    contains_aval <- "AVAL" %in% colnames(df)
+    contains_paramcd <- "PARAMCD" %in% colnames(df)
+
+    msg <- case_when(
+      !contains_aval & !contains_paramcd ~ "ADPP does not contain PARAMCD or AVAL variables",
+      contains_aval & !contains_paramcd ~ "ADPP does not contain the PARAMCD variable",
+      !contains_aval & contains_paramcd ~ "ADPP does not contain the AVAL variable",
+      .default = ""
+    )
+
+    d1_validation_message(msg)
+
+    d1_is_valid(contains_aval & contains_paramcd)
+
+    return(df)
   })
 
   dataset2 <- reactive({
     req(input$dataset2)
-    haven::read_xpt(input$dataset2$datapath)
+    df <- haven::read_xpt(input$dataset2$datapath)
+
+    contains_aval <- "AVAL" %in% colnames(df)
+    contains_paramcd <- "PARAMCD" %in% colnames(df)
+
+    msg <- case_when(
+      !contains_aval & !contains_paramcd ~ "ADPPL does not contain PARAMCD or AVAL variables",
+      contains_aval & !contains_paramcd ~ "ADPPL does not contain the PARAMCD variable",
+      !contains_aval & contains_paramcd ~ "ADPPL does not contain the AVAL variable",
+      .default = ""
+    )
+
+    d2_validation_message(msg)
+
+    d2_is_valid(contains_aval & contains_paramcd)
+
+    return(df)
 
   })
+
+
+
+  output$dataset_1_validation_message <- renderUI({
+    req(d1_validation_message())
+    d1_validation_message()
+  })
+
+  output$dataset_2_validation_message <- renderUI({
+    req(d2_validation_message())
+    d2_validation_message()
+  })
+
+
 
 
   # --- Unique Keys Definition
@@ -124,9 +175,12 @@ server <- function(input, output, session) {
 
   output$compare_btn_ui <- renderUI({
     # Disable if datasets don't exist, or if unique keys have been requested but the keys aren't valid
+
     if (is.null(dataset1()) ||
         is.null(dataset2()) ||
-        (input$unique_keys_check & !valid_keys())) {
+        (input$unique_keys_check & !valid_keys()) ||
+        !d1_is_valid() || !d2_is_valid()
+        ) {
       actionButton("compare_btn", "Compare Datasets", disabled = TRUE)
     } else {
       # Both datasets are present, enable the button
@@ -297,10 +351,13 @@ server <- function(input, output, session) {
   ##############################################################################
 
   output$download_ui <- renderUI({
-    req(comparison_result())  # Ensure report exists
-    downloadButton("download_report", "Download HTML Report")
+    req(comparison_result())
+    wellPanel(
+      tags$strong("Download Report"),
+      div(style = "margin-top: 10px;",
+          downloadButton("download_report", "Download HTML Report"))
+    )
   })
-
   output$download_report <- downloadHandler(
     filename = function() {
         paste0("adpp_comparison_report_",format(Sys.Date(), "%Y_%m_%d"),"T",format(Sys.time(), "%H_%M"),".html")
@@ -324,3 +381,4 @@ server <- function(input, output, session) {
     }
   )
 }
+

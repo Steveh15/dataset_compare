@@ -86,15 +86,28 @@ df1 <- df1_1[-sample(1:nrow(df1_1), 15), ] %>%
 test1_1 <- df1
 test1_2 <- df1
 
-haven::write_xpt(df1, file.path("data", "df1.xpt"))
-haven::write_xpt(df2, file.path("data", "df2.xpt"))
+haven::write_xpt(df1, file.path("data", "test01", "adpp.xpt"))
+haven::write_xpt(df2, file.path("data", "test01", "adppl.xpt"))
 
 
-haven::write_xpt(test1_1, file.path("data", "test1_1.xpt"))
-haven::write_xpt(test1_2, file.path("data", "test1_2.xpt"))
+haven::write_xpt(test1_1, file.path("data", "test02", "adpp.xpt"))
+haven::write_xpt(test1_2, file.path("data", "test02", "adppl.xpt"))
 
 
-#
-#
-#
-# df2 %>% count(PPTESTCD)
+haven::write_xpt(pharmaverseadam::adpp, file.path("data", "test03", "adpp.xpt"))
+# haven::write_xpt(pharmaverseadam::adpp, file.path("data", "test03", "adppl.xpt"))
+
+test5_1 <- df1 %>% select(-AVAL)
+test5_2 <- df1 %>% select(-PARAMCD)
+test5_3 <- df1 %>% select(-c(AVAL, PARAMCD))
+
+haven::write_xpt(test5_1, file.path("data", "test05", "test1.xpt"))
+haven::write_xpt(test5_2, file.path("data", "test05", "test2.xpt"))
+haven::write_xpt(test5_3, file.path("data", "test05", "test3.xpt"))
+
+
+
+
+
+
+

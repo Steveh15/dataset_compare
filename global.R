@@ -9,6 +9,7 @@ library(shinyWidgets)
 # For testing
 # library(pharmaverseadam)
 library(tidyr)
+library(knitr)
 
 # library(shinyBS)
 library(DT)
@@ -17,7 +18,7 @@ library(htmlTable)
 rm(list = ls())
 
 
-source("utils/generate_test_data.R")
+# source("utils/generate_test_data.R")
 
 
 ### App version
