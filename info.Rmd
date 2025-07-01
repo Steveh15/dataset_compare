@@ -14,8 +14,6 @@
 
 <!-- ### What the key inputs/outputs of the app are? -->
 
-<!-- ### Assumptions of the model (if applicable) -->
-
 <!-- ### An Acknowledgments Section -->
 
 <!-- ### Confidentiality Statement -->
@@ -75,7 +73,7 @@ Identifies columns that are present in only one dataset.
 
 #### ✅ Differences in Column Types
 
-Lists shared variables that have different underlying data types (e.g., `numeric` vs `character`).
+Lists shared variables that have different underlying data types (e.g., numeric vs character).
 
 #### ✅ Differences in Rounding of AVAL
 
@@ -99,7 +97,7 @@ Shows which records appear in one dataset but not the other, based on the select
 
 Compares the `AVAL` field between matched rows in both datasets. Includes two components:
 
-##### AVAL Differences Summary
+**AVAL Differences Summary**
 
 - Shows the total number of differing `AVAL` values
 - Breaks them down by magnitude of difference:
@@ -109,20 +107,14 @@ Compares the `AVAL` field between matched rows in both datasets. Includes two co
   - ∆ ≤ 1e-9 (effectively negligible)
 - Also reports the number of cases where `AVAL` is missing in one dataset
 
-##### AVAL Differences Table
+**AVAL Differences Table**
 
 Displays every individual row-level `AVAL` mismatch for detailed inspection.
 
----
+#### ✅ All Other Variables Comparison
 
-## 🗝️ Unique Key Validation
-
-Before row-level checks can run, the app verifies that your selected key variables:
-- Exist in both datasets
-- Uniquely identify each row in both datasets
-
-If the validation fails, row-level comparisons will be disabled and a warning will appear.
-
----
+Compares the values in all variables except `AVAL` and displays the results in two views:
+- Lists every individual difference found across matched rows.
+- Distinct Differences: Summarizes the unique combinations of variable name and differing values. Repeated occurrences of the same difference are shown only once.
 
 ---
